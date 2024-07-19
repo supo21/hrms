@@ -1,11 +1,18 @@
 import MainLayout from "@/components/main-layout";
 import { Button } from "@/components/ui/button";
 
-export default function Dashboard() {
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Time Logs - Sandbox HRMS",
+  description: "Human Resource Management System",
+};
+
+export default function TimeLogs() {
   return (
-    <MainLayout active={"dashboard"}>
+    <MainLayout active="time-logs">
       <div className="flex items-center">
-        <h1 className="text-lg font-semibold md:text-2xl">Dashboard</h1>
+        <h1 className="text-lg font-semibold md:text-2xl">Time Logs</h1>
       </div>
       <div
         className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm"
