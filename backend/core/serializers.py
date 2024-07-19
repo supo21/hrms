@@ -51,3 +51,11 @@ class UserDTO(RequiredFieldsModelSerializer[models.User]):
 ##############################################################################
 class GenericDTO(Serializer[Any]):
     detail = CharField()
+
+
+##############################################################################
+### Model Post Request Body
+##############################################################################
+class PostCreateUser(Serializer[Any]):
+    username = CharField()
+    password = CharField()
