@@ -19,15 +19,18 @@ def current_user(request: HttpRequest):
     return request.user
 
 
-@api.post("/users/", response=UserDTO)
+@api.post("/users/", response={200: UserDTO, 400: GenericDTO})
 def create_user(request: HttpRequest, user: CreateUser):
-    user_obj = User.objects.create_user(
-        username=user.username,
-        password=user.password,
-        is_superuser=False,
-    )
-    user_obj.save()
-    return user_obj
+    try:
+        user_obj = User.objects.create_user(
+            username=user.username,
+            password=user.password,
+            is_superuser=False,
+        )
+        user_obj.save()
+        return user_obj
+    except IntegrityError:
+        return 400, {"detail": "Username already exists."}
 
 
 @api.post("/login/", response=GenericDTO)
