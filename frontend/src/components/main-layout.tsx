@@ -15,7 +15,6 @@ import {
   Users,
 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -68,9 +67,6 @@ export default function MainLayout({
               >
                 <CalendarCheck2 className="h-4 w-4" />
                 Time Logs
-                <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
-                  6
-                </Badge>
               </Link>
               <Link
                 href="/time-summary"
@@ -149,9 +145,6 @@ export default function MainLayout({
                 >
                   <ShoppingCart className="h-5 w-5" />
                   Orders
-                  <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
-                    6
-                  </Badge>
                 </Link>
                 <Link
                   href="#"
