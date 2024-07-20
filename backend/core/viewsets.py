@@ -4,8 +4,8 @@ from typing import TypedDict
 from typing import TypeVar
 
 from django.db.models import Model
-from drf_spectacular.utils import extend_schema
-from drf_spectacular.utils import extend_schema_view
+from drf_spectacular.utils import extend_schema  # type: ignore
+from drf_spectacular.utils import extend_schema_view  # type: ignore
 from rest_framework import status
 from rest_framework.exceptions import APIException
 from rest_framework.request import Request

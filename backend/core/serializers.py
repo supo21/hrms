@@ -16,16 +16,16 @@ M = TypeVar("M", bound=Model)
 ##############################################################################
 class RequiredFieldsModelSerializer(ModelSerializer[M]):
     def __init__(self, *args: Any, **kwargs: Any):
-        super().__init__(*args, **kwargs)
-        for _, field in self.fields.items():
+        super().__init__(*args, **kwargs)  # type: ignore
+        for _, field in self.fields.items():  # type: ignore
             if not isinstance(field, serializers.HiddenField):
                 field.required = True
 
 
 class NotRequiredFieldsModelSerializer(ModelSerializer[M]):
     def __init__(self, *args: Any, **kwargs: Any):
-        super().__init__(*args, **kwargs)
-        for _, field in self.fields.items():
+        super().__init__(*args, **kwargs)  # type: ignore
+        for _, field in self.fields.items():  # type: ignore
             if not isinstance(field, serializers.HiddenField):
                 field.required = False
 

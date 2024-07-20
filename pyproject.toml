@@ -1,4 +1,5 @@
 [tool.isort]
+src_paths = ["backend"]
 line_length = 79
 force_single_line = true
 

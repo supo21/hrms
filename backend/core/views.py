@@ -1,16 +1,17 @@
 from typing import Any
 
-from core import serializers
-from core.models import User
-from core.serializers import UserDTO
-from core.viewsets import GenericViewSet
-from core.viewsets import schema_viewset
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+
+from core import serializers
+from core.models import User
+from core.serializers import UserDTO
+from core.viewsets import GenericViewSet
+from core.viewsets import schema_viewset
 
 
 @schema_viewset
@@ -34,9 +35,8 @@ class UserViewSet(GenericViewSet[User]):
     )
     def current(self, request: Request):
         serializer = UserDTO(instance=request.user)
-
         return Response(
-            serializer.data,
+            serializer.data,  # type: ignore
             status=status.HTTP_200_OK,
         )
 
