@@ -44,29 +44,38 @@ class Project(BaseModel):
     name = models.CharField()
 
 
+class Activity(BaseModel):
+    name = models.CharField()
+
+    class Meta:  # type: ignore
+        verbose_name_plural = "Activities"
+
+
 class TimeLog(BaseModel):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="time_logs"
     )
     begin = models.DateTimeField()
-    end = models.DateTimeField()
+    end = models.DateTimeField(blank=True, null=True)
     project = models.ForeignKey(
-        Project, on_delete=models.CASCADE, related_name="time_logs"
+        Project, on_delete=models.PROTECT, related_name="time_logs"
     )
-    activity = models.CharField()
+    activity = models.ForeignKey(
+        Activity, on_delete=models.PROTECT, related_name="time_logs"
+    )
 
 
 class Holiday(BaseModel):
     name = models.CharField()
-    begin = models.DateTimeField()
+    date = models.DateField()
 
 
 class AbsenceBalance(BaseModel):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="absence_balances"
     )
-    date = models.DateTimeField()
-    name = models.CharField(max_length=500)
+    date = models.DateField()
+    description = models.CharField(max_length=500)
     delta = models.IntegerField()
     created_by = models.ForeignKey(
         User,

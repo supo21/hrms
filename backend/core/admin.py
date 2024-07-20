@@ -2,6 +2,11 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 
+from core.models import AbsenceBalance
+from core.models import Activity
+from core.models import Holiday
+from core.models import Project
+from core.models import TimeLog
 from core.models import User
 
 
@@ -24,3 +29,48 @@ class UserAdmin(BaseUserAdmin):
             },
         ),
     )
+
+
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin[Project]):
+    search_fields = ["id", "name"]
+    list_display = ["id", "name"]
+
+    class Meta:
+        model = Project
+
+
+@admin.register(Activity)
+class ActivityAdmin(admin.ModelAdmin[Activity]):
+    search_fields = ["id", "name"]
+    list_display = ["id", "name"]
+
+    class Meta:
+        model = Activity
+
+
+@admin.register(TimeLog)
+class TimeLogAdmin(admin.ModelAdmin[TimeLog]):
+    search_fields = ["user__username", "project__name", "activity__name"]
+    list_display = ["id", "user", "begin", "end", "project", "activity"]
+
+    class Meta:
+        model = TimeLog
+
+
+@admin.register(Holiday)
+class HolidayAdmin(admin.ModelAdmin[Holiday]):
+    search_fields = ["id", "name"]
+    list_display = ["id", "name", "date"]
+
+    class Meta:
+        model = Holiday
+
+
+@admin.register(AbsenceBalance)
+class AbsenceBalanceAdmin(admin.ModelAdmin[AbsenceBalance]):
+    search_fields = ["id", "user", "description"]
+    list_display = ["id", "user", "date", "description", "delta", "created_by"]
+
+    class Meta:
+        model = AbsenceBalance
