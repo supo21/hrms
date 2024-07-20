@@ -1,6 +1,8 @@
 from ninja import ModelSchema
 from ninja import Schema
 
+from core.models import Activity
+from core.models import Project
 from core.models import TimeLog
 from core.models import User
 
@@ -14,6 +16,18 @@ class UserDTO(ModelSchema):
 class TimeLogDTO(ModelSchema):
     class Meta:
         model = TimeLog
+        fields = "__all__"
+
+
+class ProjectDTO(ModelSchema):
+    class Meta:
+        model = Project
+        fields = "__all__"
+
+
+class ActivityDTO(ModelSchema):
+    class Meta:
+        model = Activity
         fields = "__all__"
 
 

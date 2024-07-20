@@ -1,24 +1,39 @@
 from django.contrib.auth import authenticate
-from django.contrib.auth import login as auth_login
-from django.contrib.auth import logout as auth_logout
+from django.contrib.auth import login
+from django.contrib.auth import logout
 from django.db import IntegrityError
 from django.http import HttpRequest
 from django.utils import timezone
 from ninja import NinjaAPI
+from ninja.pagination import paginate  # type: ignore
 from ninja.security import django_auth
 
 from core.models import Activity
 from core.models import Project
 from core.models import TimeLog
 from core.models import User
+from core.schemas import ActivityDTO
 from core.schemas import CreateUser
 from core.schemas import GenericDTO
 from core.schemas import Login
+from core.schemas import ProjectDTO
 from core.schemas import StartTimeLog
 from core.schemas import TimeLogDTO
 from core.schemas import UserDTO
 
 api = NinjaAPI(docs_url="/docs/", csrf=True)
+
+
+@api.get("/projects/", response=list[ProjectDTO], auth=django_auth)
+@paginate
+def list_projects(request: HttpRequest):
+    return Project.objects.all()
+
+
+@api.get("/activities/", response=list[ActivityDTO], auth=django_auth)
+@paginate
+def list_activities(request: HttpRequest):
+    return Activity.objects.all()
 
 
 @api.get("/users/current/", response=UserDTO, auth=django_auth)
@@ -38,6 +53,18 @@ def create_user(request: HttpRequest, user: CreateUser):
         return user_obj
     except IntegrityError:
         return 400, {"detail": "Username already exists."}
+
+
+@api.get(
+    "/time-logs/current/",
+    auth=django_auth,
+    response={404: GenericDTO, 200: TimeLogDTO},
+)
+def current_time_log(request: HttpRequest):
+    obj = TimeLog.objects.filter(user=request.user, end=None).first()
+    if not obj:
+        return 404, {"detail": "Not found."}
+    return obj
 
 
 @api.post(
@@ -66,25 +93,27 @@ def start_time_log(request: HttpRequest, data: StartTimeLog):
 
 @api.post("/time-logs/end/", auth=django_auth, response=GenericDTO)
 def end_time_log(request: HttpRequest):
-    TimeLog.objects.filter(end=None).update(end=timezone.now())
+    TimeLog.objects.filter(user=request.user, end=None).update(
+        end=timezone.now()
+    )
     return {"detail": "Success."}
 
 
-@api.post("/login/", response=GenericDTO)
-def login(request: HttpRequest, data: Login):
+@api.post("/auth/login/", response=GenericDTO)
+def auth_login(request: HttpRequest, data: Login):
     user = authenticate(
         request,
         username=data.username,
         password=data.password,
     )
     if user is not None:
-        auth_login(request, user)
+        login(request, user)
         return {"detail": "Success."}
     else:
         return {"detail": "Invalid credentials."}
 
 
-@api.post("/logout/", response=GenericDTO)
-def logout(request: HttpRequest):
-    auth_logout(request)
+@api.post("/auth/logout/", response=GenericDTO)
+def auth_logout(request: HttpRequest):
+    logout(request)
     return {"detail": "Success."}
