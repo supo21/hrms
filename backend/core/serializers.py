@@ -35,15 +35,8 @@ class NotRequiredFieldsModelSerializer(ModelSerializer[M]):
 ##############################################################################
 class UserDTO(RequiredFieldsModelSerializer[models.User]):
     class Meta:  # type: ignore
-        model = models.User
-        fields = [
-            "id",
-            "first_name",
-            "last_name",
-            "username",
-            "email",
-            "is_superuser",
-        ]
+        model: type[Model] = models.User
+        exclude = ["password"]
 
 
 ##############################################################################
