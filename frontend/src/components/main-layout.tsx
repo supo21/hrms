@@ -4,7 +4,6 @@ import {
   Bell,
   CalendarCheck2,
   CalendarX2,
-  CircleUser,
   Home,
   LineChart,
   Menu,
@@ -25,16 +24,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import ProfileDropdown from "./profile-dropdown";
 const activeLink =
   "flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary";
 const inactiveLink =
@@ -213,22 +205,7 @@ export default function MainLayout({
               </div>
             </form>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="icon" className="rounded-full">
-                <CircleUser className="h-5 w-5" />
-                <span className="sr-only">Toggle user menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Support</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ProfileDropdown />
         </header>
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
           {children}
