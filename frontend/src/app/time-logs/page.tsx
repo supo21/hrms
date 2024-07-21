@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   description: "Human Resource Management System",
 };
 
-export async function getTimeLogs(): Promise<
+async function getTimeLogs(): Promise<
   components["schemas"]["PagedTimeLogDTO"] | null
 > {
   const cookieStore = cookies();
@@ -34,7 +34,7 @@ export async function getTimeLogs(): Promise<
   });
   if (res.status === 401) redirect("/login/");
   if (!res.ok) return null;
-  return res.json();
+  return await res.json();
 }
 
 export default async function TimeLogs() {

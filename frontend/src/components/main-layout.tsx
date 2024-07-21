@@ -34,7 +34,7 @@ const activeLink =
 const inactiveLink =
   "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary";
 
-export async function getCurrentTimeLog() {
+async function getCurrentTimeLog() {
   const cookieStore = cookies();
   const sessionid = cookieStore.get("sessionid");
   if (!sessionid) redirect("/login/");
@@ -45,7 +45,7 @@ export async function getCurrentTimeLog() {
   });
   if (res.status === 401) redirect("/login/");
   if (!res.ok) return null;
-  return res.json();
+  return await res.json();
 }
 
 export default async function MainLayout({
