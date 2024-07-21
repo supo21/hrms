@@ -15,6 +15,7 @@ services:
       - POSTGRES_HOST=db
       - POSTGRES_DB=hrms
       - POSTGRES_PASSWORD=postgres
+      - ALLOWED_HOSTS=backend
     depends_on:
       db:
         condition: service_healthy
