@@ -1,7 +1,5 @@
 import MainLayout from "@/components/main-layout";
 import PageUnderConstruction from "@/components/page-under-construction";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 export default function Dashboard() {
   return (

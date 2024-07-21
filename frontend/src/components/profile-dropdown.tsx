@@ -8,11 +8,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { CircleUser } from "lucide-react";
+import { UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 async function logout() {
-  const res = await fetch("http://localhost:3000/api/logout/", {
+  const res = await fetch("http://localhost:3000/api/auth/logout/", {
     method: "POST",
   });
   return res.ok;
@@ -24,7 +24,7 @@ export default function ProfileDropdown() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="secondary" size="icon" className="rounded-full">
-          <CircleUser className="h-5 w-5" />
+          <UserRound className="h-5 w-5" />
           <span className="sr-only">Toggle user menu</span>
         </Button>
       </DropdownMenuTrigger>
