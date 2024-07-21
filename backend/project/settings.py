@@ -37,11 +37,15 @@ if not ENV.DEBUG:
 
 ALLOWED_HOSTS = ENV.ALLOWED_HOSTS.split(",")
 CSRF_TRUSTED_ORIGINS = ENV.CSRF_TRUSTED_ORIGINS.split(",")
+CORS_ALLOWED_ORIGINS = ENV.CORS_ALLOWED_ORIGINS.split(",")
+CORS_ALLOW_CREDENTIALS = True
+
 
 # Application definition
 
 INSTALLED_APPS = [
     "core",
+    "corsheaders",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -51,6 +55,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
