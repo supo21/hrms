@@ -1,9 +1,0 @@
-version: 3
-
-tasks:
-  backend:
-    cmds:
-      - cd backend && python manage.py runserver
-  frontend:
-    cmds:
-      - cd frontend && npm run dev
