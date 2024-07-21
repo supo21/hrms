@@ -7,44 +7,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { API_HOST } from "@/lib/constants";
 import { components } from "@/lib/schema";
 import { getCookie, getDuration } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
-async function startTimeLog() {
-  const csrftoken = getCookie("csrftoken");
-  if (!csrftoken) return null;
-  const res = await fetch("http://localhost:3000/api/time-logs/start/", {
-    method: "POST",
-    headers: {
-      "X-CSRFToken": csrftoken,
-    },
-    body: JSON.stringify({
-      project: 1,
-      activity: 1,
-    }),
-  });
-  if (!res.ok) return null;
-  return res.json();
-}
-
-async function endTimeLog() {
-  const csrftoken = getCookie("csrftoken");
-  if (!csrftoken) return false;
-  const res = await fetch("http://localhost:3000/api/time-logs/end/", {
-    method: "POST",
-    headers: {
-      "X-CSRFToken": csrftoken,
-    },
-  });
-  return res.ok;
-}
 
 export default function TimeLogCard({
   initial,
 }: {
   initial: components["schemas"]["TimeLogDTO"];
 }) {
+  const router = useRouter();
+
   const [currentTimeLog, setCurrentTimeLog] = useState<
     components["schemas"]["TimeLogDTO"] | null
   >(initial);
@@ -73,8 +48,17 @@ export default function TimeLogCard({
       <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
         <Button
           onClick={async () => {
-            const data = await endTimeLog();
-            if (data) setCurrentTimeLog(null);
+            const csrftoken = getCookie("csrftoken");
+            if (!csrftoken) return false;
+            const res = await fetch(`${API_HOST}/api/time-logs/end/`, {
+              method: "POST",
+              credentials: "include",
+              headers: {
+                "X-CSRFToken": csrftoken,
+              },
+            });
+            if (res.status === 401) router.push("/login/");
+            if (res.ok) setCurrentTimeLog(null);
           }}
           size="sm"
           className="w-full"
@@ -92,7 +76,22 @@ export default function TimeLogCard({
       <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
         <Button
           onClick={async () => {
-            const data = await startTimeLog();
+            const csrftoken = getCookie("csrftoken");
+            if (!csrftoken) return null;
+            const res = await fetch(`${API_HOST}/api/time-logs/start/`, {
+              method: "POST",
+              credentials: "include",
+              headers: {
+                "X-CSRFToken": csrftoken,
+              },
+              body: JSON.stringify({
+                project: 1,
+                activity: 1,
+              }),
+            });
+            if (res.status === 401) router.push("/login/");
+            if (!res.ok) return null;
+            const data = await res.json();
             if (data) setCurrentTimeLog(data);
           }}
           size="sm"

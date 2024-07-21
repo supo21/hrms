@@ -9,14 +9,33 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getTimeLogs } from "@/lib/api";
 import { getDuration } from "@/lib/utils";
 import { format } from "date-fns";
+import { cookies } from "next/headers";
+import { components } from "@/lib/schema";
+import { API_HOST } from "@/lib/constants";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Time Logs - Sandbox HRMS",
   description: "Human Resource Management System",
 };
+
+export async function getTimeLogs(): Promise<
+  components["schemas"]["PagedTimeLogDTO"] | null
+> {
+  const cookieStore = cookies();
+  const sessionid = cookieStore.get("sessionid");
+  if (!sessionid) redirect("/login/");
+  const res = await fetch(`${API_HOST}/api/time-logs/?limit=10`, {
+    headers: {
+      Cookie: `sessionid=${sessionid.value}`,
+    },
+  });
+  if (res.status === 401) redirect("/login/");
+  if (!res.ok) return null;
+  return res.json();
+}
 
 export default async function TimeLogs() {
   const timeLogs = await getTimeLogs();

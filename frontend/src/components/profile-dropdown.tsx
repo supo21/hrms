@@ -11,12 +11,14 @@ import { Button } from "@/components/ui/button";
 import { UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getCookie } from "@/lib/utils";
+import { API_HOST } from "@/lib/constants";
 
 async function logout() {
   const csrftoken = getCookie("csrftoken");
   if (!csrftoken) return false;
-  const res = await fetch("http://localhost:3000/api/auth/logout/", {
+  const res = await fetch(`${API_HOST}/api/auth/logout/`, {
     method: "POST",
+    credentials: "include",
     headers: {
       "X-CSRFToken": csrftoken,
     },
@@ -39,8 +41,7 @@ export default function ProfileDropdown() {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={async () => {
-            if (await logout())
-              router.push("http://localhost:3000/admin/login/?next=/");
+            if (await logout()) router.push("/login/");
           }}
         >
           Logout

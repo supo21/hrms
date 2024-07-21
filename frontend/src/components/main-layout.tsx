@@ -25,12 +25,28 @@ import {
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import ProfileDropdown from "./profile-dropdown";
-import { getCurrentTimeLog } from "@/lib/api";
 import TimeLogCard from "./time-log-card";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { API_HOST } from "@/lib/constants";
 const activeLink =
   "flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary";
 const inactiveLink =
   "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary";
+
+export async function getCurrentTimeLog() {
+  const cookieStore = cookies();
+  const sessionid = cookieStore.get("sessionid");
+  if (!sessionid) redirect("/login/");
+  const res = await fetch(`${API_HOST}/api/time-logs/current/`, {
+    headers: {
+      Cookie: `sessionid=${sessionid.value}`,
+    },
+  });
+  if (res.status === 401) redirect("/login/");
+  if (!res.ok) return null;
+  return res.json();
+}
 
 export default async function MainLayout({
   active,
