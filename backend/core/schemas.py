@@ -1,3 +1,4 @@
+from ninja import Field
 from ninja import ModelSchema
 from ninja import Schema
 
@@ -14,6 +15,9 @@ class UserDTO(ModelSchema):
 
 
 class TimeLogDTO(ModelSchema):
+    project__name: str = Field(..., alias="project.name")
+    activity__name: str = Field(..., alias="activity.name")
+
     class Meta:
         model = TimeLog
         fields = "__all__"
@@ -36,8 +40,8 @@ class GenericDTO(Schema):
 
 
 class StartTimeLog(Schema):
-    project__id: int
-    activity__id: int
+    project: int
+    activity: int
 
 
 class CreateUser(Schema):

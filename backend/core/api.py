@@ -56,6 +56,20 @@ def create_user(request: HttpRequest, user: CreateUser):
 
 
 @api.get(
+    "/time-logs/",
+    auth=django_auth,
+    response={200: list[TimeLogDTO]},
+)
+@paginate
+def list_time_logs(request: HttpRequest):
+    if request.user.is_superuser:  # type: ignore
+        objs = TimeLog.objects.filter()
+    else:
+        objs = TimeLog.objects.filter(user=request.user)
+    return objs
+
+
+@api.get(
     "/time-logs/current/",
     auth=django_auth,
     response={404: GenericDTO, 200: TimeLogDTO},
@@ -80,8 +94,8 @@ def start_time_log(request: HttpRequest, data: StartTimeLog):
             user=request.user,
             begin=timezone.now(),
             end=None,
-            project=Project.objects.get(id=data.project__id),
-            activity=Activity.objects.get(id=data.activity__id),
+            project=Project.objects.get(id=data.project),
+            activity=Activity.objects.get(id=data.activity),
         )
         obj.save()
         return obj
