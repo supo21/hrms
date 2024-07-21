@@ -10,10 +10,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { getCookie } from "@/lib/utils";
 
 async function logout() {
+  const csrftoken = getCookie("csrftoken");
+  if (!csrftoken) return false;
   const res = await fetch("http://localhost:3000/api/auth/logout/", {
     method: "POST",
+    headers: {
+      "X-CSRFToken": csrftoken,
+    },
   });
   return res.ok;
 }

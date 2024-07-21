@@ -8,8 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { components } from "@/lib/schema";
-import { getCookie } from "@/lib/utils";
-import { intervalToDuration } from "date-fns";
+import { getCookie, getDuration } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 async function startTimeLog() {
@@ -41,17 +40,6 @@ async function endTimeLog() {
   return res.ok;
 }
 
-function getDuration(start: Date, end: Date) {
-  const duration = intervalToDuration({
-    start,
-    end,
-  });
-  let text = "";
-  if (duration.hours) text += duration.hours + "h";
-  if (duration.minutes) text += duration.minutes + "m";
-  text += (duration.seconds || 0) + "s";
-  return text;
-}
 export default function TimeLogCard({
   initial,
 }: {

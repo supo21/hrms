@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
+import { intervalToDuration } from "date-fns";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -19,4 +20,16 @@ export function getCookie(name: string) {
     }
   }
   return cookieValue;
+}
+
+export function getDuration(start: Date, end: Date) {
+  const duration = intervalToDuration({
+    start,
+    end,
+  });
+  let text = "";
+  if (duration.hours) text += duration.hours + "h";
+  if (duration.minutes) text += duration.minutes + "m";
+  text += (duration.seconds || 0) + "s";
+  return text;
 }

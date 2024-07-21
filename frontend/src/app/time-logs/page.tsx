@@ -9,64 +9,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getTimeLogs } from "@/lib/api";
+import { getDuration } from "@/lib/utils";
+import { format } from "date-fns";
 
 export const metadata: Metadata = {
   title: "Time Logs - Sandbox HRMS",
   description: "Human Resource Management System",
 };
 
-const data = [
-  {
-    id: "1",
-    start: "Jul 19 23:46",
-    end: "Jul 19 23:46",
-    duration: "10h55m",
-    project: "Project L",
-    activity: "System Administration",
-  },
-  {
-    id: "1",
-    start: "Jul 19 23:46",
-    end: "Jul 19 23:46",
-    duration: "10h55m",
-    project: "Project L",
-    activity: "System Administration",
-  },
-  {
-    id: "1",
-    start: "Jul 19 23:46",
-    end: "Jul 19 23:46",
-    duration: "10h55m",
-    project: "Project L",
-    activity: "System Administration",
-  },
-
-  {
-    id: "1",
-    start: "Jul 19 23:46",
-    end: "Jul 19 23:46",
-    duration: "10h55m",
-    project: "Project L",
-    activity: "System Administration",
-  },
-  {
-    id: "1",
-    start: "Jul 19 23:46",
-    end: "Jul 19 23:46",
-    duration: "10h55m",
-    project: "Project L",
-    activity: "System Administration",
-  },
-];
-
-export default function TimeLogs() {
+export default async function TimeLogs() {
+  const timeLogs = await getTimeLogs();
   return (
     <MainLayout active="time-logs">
       <div className="flex items-center">
         <h1 className="text-lg font-semibold md:text-2xl">Time Logs</h1>
       </div>
       <Table>
-        <TableCaption>Showing 7 out of 300.</TableCaption>
+        <TableCaption>
+          Showing {timeLogs?.items.length} out of {timeLogs?.count}
+        </TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead className="w-[100px]">ID</TableHead>
@@ -77,18 +39,27 @@ export default function TimeLogs() {
             <TableHead>Activity</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
-          {data.map((invoice) => (
-            <TableRow key={invoice.id}>
-              <TableCell className="font-medium">{invoice.id}</TableCell>
-              <TableCell>{invoice.start}</TableCell>
-              <TableCell>{invoice.end}</TableCell>
-              <TableCell>{invoice.duration}</TableCell>
-              <TableCell>{invoice.project}</TableCell>
-              <TableCell>{invoice.activity}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
+        {timeLogs ? (
+          <TableBody>
+            {timeLogs.items.map((i) => (
+              <TableRow key={i.id}>
+                <TableCell className="font-medium">{i.id}</TableCell>
+                <TableCell>{format(i.begin, "yyyy/MM/dd hh:mm aa")}</TableCell>
+                <TableCell>
+                  {i.end ? format(i.end, "yyyy/MM/dd hh:mm aa") : "-"}
+                </TableCell>
+                <TableCell>
+                  {getDuration(
+                    new Date(i.begin),
+                    i.end ? new Date(i.end) : new Date()
+                  )}
+                </TableCell>
+                <TableCell>{i.project__name}</TableCell>
+                <TableCell>{i.activity__name}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        ) : null}
       </Table>
     </MainLayout>
   );

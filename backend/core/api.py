@@ -27,13 +27,13 @@ api = NinjaAPI(docs_url="/docs/", csrf=True)
 @api.get("/projects/", response=list[ProjectDTO], auth=django_auth)
 @paginate
 def list_projects(request: HttpRequest):
-    return Project.objects.all()
+    return Project.objects.all().order_by("-id")
 
 
 @api.get("/activities/", response=list[ActivityDTO], auth=django_auth)
 @paginate
 def list_activities(request: HttpRequest):
-    return Activity.objects.all()
+    return Activity.objects.all().order_by("-id")
 
 
 @api.get("/users/current/", response=UserDTO, auth=django_auth)
@@ -63,10 +63,10 @@ def create_user(request: HttpRequest, user: CreateUser):
 @paginate
 def list_time_logs(request: HttpRequest):
     if request.user.is_superuser:  # type: ignore
-        objs = TimeLog.objects.filter()
+        objs = TimeLog.objects.all()
     else:
         objs = TimeLog.objects.filter(user=request.user)
-    return objs
+    return objs.order_by("-id")
 
 
 @api.get(
