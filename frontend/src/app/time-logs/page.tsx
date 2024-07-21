@@ -11,9 +11,8 @@ import {
 } from "@/components/ui/table";
 import { getDuration } from "@/lib/utils";
 import { format } from "date-fns";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { components } from "@/lib/schema";
-import { API_HOST } from "@/lib/constants";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
@@ -27,7 +26,8 @@ async function getTimeLogs(): Promise<
   const cookieStore = cookies();
   const sessionid = cookieStore.get("sessionid");
   if (!sessionid) redirect("/login/");
-  const res = await fetch(`${API_HOST}/api/time-logs/?limit=10`, {
+  const origin = new URL(headers().get("referer") || "").origin;
+  const res = await fetch(`${origin}/api/time-logs/?limit=10`, {
     headers: {
       Cookie: `sessionid=${sessionid.value}`,
     },
