@@ -55,6 +55,7 @@ export default async function TimeLogs() {
         <TableHeader>
           <TableRow>
             <TableHead className="w-[100px]">ID</TableHead>
+            <TableHead>User</TableHead>
             <TableHead>Start</TableHead>
             <TableHead>End</TableHead>
             <TableHead>Duration</TableHead>
@@ -67,6 +68,7 @@ export default async function TimeLogs() {
             {timeLogs.items.map((i) => (
               <TableRow key={i.id}>
                 <TableCell className="font-medium">{i.id}</TableCell>
+                <TableCell>{i.user__username}</TableCell>
                 <TableCell>{format(i.begin, "yyyy/MM/dd hh:mm aa")}</TableCell>
                 <TableCell>
                   {i.end ? format(i.end, "yyyy/MM/dd hh:mm aa") : "-"}
