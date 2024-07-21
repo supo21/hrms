@@ -11,9 +11,10 @@ import {
 } from "@/components/ui/table";
 import { getDuration } from "@/lib/utils";
 import { format } from "date-fns";
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { components } from "@/lib/schema";
 import { redirect } from "next/navigation";
+import { API_HOST } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Time Logs - Sandbox HRMS",
@@ -26,8 +27,7 @@ async function getTimeLogs(): Promise<
   const cookieStore = cookies();
   const sessionid = cookieStore.get("sessionid");
   if (!sessionid) redirect("/login/");
-  const origin = new URL(headers().get("referer") || "").origin;
-  const res = await fetch(`${origin}/api/time-logs/?limit=10`, {
+  const res = await fetch(`${API_HOST}/api/time-logs/?limit=10`, {
     headers: {
       Cookie: `sessionid=${sessionid.value}`,
     },
