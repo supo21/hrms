@@ -113,7 +113,7 @@ def end_time_log(request: HttpRequest):
     return {"detail": "Success."}
 
 
-@api.post("/auth/login/", response=GenericDTO)
+@api.post("/auth/login/", response={200: GenericDTO, 400: GenericDTO})
 def auth_login(request: HttpRequest, data: Login):
     user = authenticate(
         request,
@@ -122,9 +122,9 @@ def auth_login(request: HttpRequest, data: Login):
     )
     if user is not None:
         login(request, user)
-        return {"detail": "Success."}
+        return 200, {"detail": "Success."}
     else:
-        return {"detail": "Invalid credentials."}
+        return 400, {"detail": "Invalid credentials."}
 
 
 @api.post("/auth/logout/", response=GenericDTO)
