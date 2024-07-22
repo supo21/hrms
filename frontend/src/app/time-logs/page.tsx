@@ -9,12 +9,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getDuration } from "@/lib/utils";
-import { format } from "date-fns";
 import { cookies } from "next/headers";
 import { components } from "@/lib/schema";
 import { redirect } from "next/navigation";
 import { API_HOST } from "@/lib/constants";
 import Pagination from "@/components/pagination";
+import TimeLogStart from "@/components/time-log-start";
+import TimeLogEnd from "@/components/time-log-end";
 
 export const metadata: Metadata = {
   title: "Time Logs - Sandbox HRMS",
@@ -80,10 +81,10 @@ export default async function TimeLogs({
                 <TableCell className="font-medium">{i.id}</TableCell>
                 <TableCell>{i.user__username}</TableCell>
                 <TableCell>
-                  {format(new Date(i.begin), "yyyy/MM/dd hh:mm aa")}
+                  <TimeLogStart start={i.begin} />
                 </TableCell>
                 <TableCell>
-                  {i.end ? format(new Date(i.end), "yyyy/MM/dd hh:mm aa") : "-"}
+                  <TimeLogEnd end={i.end} />
                 </TableCell>
                 <TableCell>
                   {getDuration(
