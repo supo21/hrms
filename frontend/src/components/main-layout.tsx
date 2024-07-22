@@ -8,6 +8,7 @@ import {
   Menu,
   Package2,
   Search,
+  Settings,
   UserRoundX,
 } from "lucide-react";
 
@@ -116,7 +117,13 @@ export default async function MainLayout({
   active,
   children,
 }: Readonly<{
-  active: "dashboard" | "time-logs" | "time-summary" | "holidays" | "absenses";
+  active:
+    | "dashboard"
+    | "time-logs"
+    | "time-summary"
+    | "holidays"
+    | "absenses"
+    | "settings";
   children: React.ReactNode;
 }>) {
   const [currentTimeLog, projects, activities, currentUser] = await Promise.all(
@@ -173,6 +180,13 @@ export default async function MainLayout({
                 >
                   <UserRoundX className="h-4 w-4" />
                   Absenses
+                </Link>
+                <Link
+                  href="/settings/"
+                  className={active === "settings" ? activeLink : inactiveLink}
+                >
+                  <Settings className="h-4 w-4" />
+                  Settings
                 </Link>
               </nav>
             </div>
@@ -252,6 +266,15 @@ export default async function MainLayout({
                   >
                     <UserRoundX className="h-4 w-4" />
                     Absenses
+                  </Link>
+                  <Link
+                    href="/settings/"
+                    className={
+                      active === "settings" ? activeLink : inactiveLink
+                    }
+                  >
+                    <Settings className="h-4 w-4" />
+                    Settings
                   </Link>
                 </nav>
                 <div className="mt-auto">
