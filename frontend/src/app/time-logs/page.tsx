@@ -16,6 +16,7 @@ import { API_HOST } from "@/lib/constants";
 import Pagination from "@/components/pagination";
 import TimeLogStart from "@/components/time-log-start";
 import TimeLogEnd from "@/components/time-log-end";
+import CountUp from "@/components/count-up";
 
 export const metadata: Metadata = {
   title: "Time Logs - Sandbox HRMS",
@@ -87,9 +88,10 @@ export default async function TimeLogs({
                   <TimeLogEnd end={i.end} />
                 </TableCell>
                 <TableCell>
-                  {getDuration(
-                    new Date(i.begin),
-                    i.end ? new Date(i.end) : new Date()
+                  {i.end ? (
+                    getDuration(new Date(i.begin), new Date(i.end))
+                  ) : (
+                    <CountUp date={new Date(i.begin)} />
                   )}
                 </TableCell>
                 <TableCell>{i.project__name}</TableCell>

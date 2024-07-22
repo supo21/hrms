@@ -8,10 +8,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { components } from "@/lib/schema";
-import { getCookie, getDuration } from "@/lib/utils";
+import { getCookie } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { StartSession } from "./start-session";
+import CountUp from "./count-up";
 
 export default function TimeLogCard({
   initial,
@@ -27,23 +28,13 @@ export default function TimeLogCard({
   const [currentTimeLog, setCurrentTimeLog] = useState<
     components["schemas"]["TimeLogDTO"] | null
   >(initial);
-  const [now, setNow] = useState(new Date());
-  const duration = getDuration(
-    currentTimeLog ? new Date(currentTimeLog.begin) : now,
-    now
-  );
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setNow(new Date());
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   return currentTimeLog ? (
     <Card x-chunk="dashboard-02-chunk-0">
       <CardHeader className="p-2 pt-0 md:p-4">
-        <CardTitle suppressHydrationWarning>{duration}</CardTitle>
+        <CardTitle>
+          <CountUp date={new Date(currentTimeLog.begin)} />
+        </CardTitle>
         <CardDescription>
           {currentTimeLog.project__name}
           <br />
