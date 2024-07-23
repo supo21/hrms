@@ -9,41 +9,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { API_HOST } from "@/lib/constants";
-import { components } from "@/lib/schema";
 import Pagination from "@/components/pagination";
+import { getHolidays } from "@/lib/apiServer";
 
 export const metadata: Metadata = {
   title: "Holidays - Sandbox HRMS",
   description: "Human Resource Management System",
 };
-
-async function getHolidays(
-  page: number = 1,
-  limit: number = 10
-): Promise<components["schemas"]["PagedHolidayDTO"] | null> {
-  const cookieStore = cookies();
-  const sessionid = cookieStore.get("sessionid");
-  if (!sessionid) redirect("/login/");
-  try {
-    const res = await fetch(
-      `${API_HOST}/api/holidays/?limit=${limit}&offset=${(page - 1) * limit}`,
-      {
-        headers: {
-          Cookie: `sessionid=${sessionid.value}`,
-        },
-      }
-    );
-    if (res.status === 401) redirect("/login/");
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (err) {
-    console.log(err);
-    return null;
-  }
-}
 
 export default async function TimeLogs({
   searchParams,

@@ -24,94 +24,19 @@ import {
 } from "@/components/ui/sheet";
 import ProfileDropdown from "./profile-dropdown";
 import TimeLogCard from "./time-log-card";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { API_HOST } from "@/lib/constants";
 import { Toaster } from "@/components/ui/toaster";
+import {
+  getActivities,
+  getCurrentTimeLog,
+  getCurrentUser,
+  getProjects,
+} from "@/lib/apiServer";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
 const activeLink =
   "flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary";
 const inactiveLink =
   "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary";
-
-async function getCurrentTimeLog() {
-  const cookieStore = cookies();
-  const sessionid = cookieStore.get("sessionid");
-  if (!sessionid) redirect("/login/");
-  try {
-    const res = await fetch(`${API_HOST}/api/time-logs/current/`, {
-      headers: {
-        Cookie: `sessionid=${sessionid.value}`,
-      },
-    });
-    if (res.status === 401) redirect("/login/");
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (err) {
-    return null;
-  }
-}
-
-async function getProjects() {
-  const cookieStore = cookies();
-  const sessionid = cookieStore.get("sessionid");
-  if (!sessionid) redirect("/login/");
-  try {
-    const res = await fetch(`${API_HOST}/api/projects/`, {
-      method: "GET",
-      headers: {
-        Cookie: `sessionid=${sessionid.value}`,
-      },
-    });
-    if (!res.ok) {
-      return;
-    }
-    return await res.json();
-  } catch (err) {
-    return null;
-  }
-}
-
-async function getActivities() {
-  const cookieStore = cookies();
-  const sessionid = cookieStore.get("sessionid");
-  if (!sessionid) redirect("/login/");
-  try {
-    const res = await fetch(`${API_HOST}/api/activities/`, {
-      method: "GET",
-      headers: {
-        Cookie: `sessionid=${sessionid.value}`,
-      },
-    });
-    if (!res.ok) {
-      return;
-    }
-    return await res.json();
-  } catch (err) {
-    return null;
-  }
-}
-
-async function getCurrentUser() {
-  const cookieStore = cookies();
-  const sessionid = cookieStore.get("sessionid");
-  if (!sessionid) redirect("/login/");
-  try {
-    const res = await fetch(`${API_HOST}/api/users/current/`, {
-      method: "GET",
-      headers: {
-        Cookie: `sessionid=${sessionid.value}`,
-      },
-    });
-    if (!res.ok) {
-      return;
-    }
-    return await res.json();
-  } catch (err) {
-    return null;
-  }
-}
 
 export default async function MainLayout({
   active,
