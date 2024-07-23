@@ -9,7 +9,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getAbsenceBalances, getCurrentUser } from "@/lib/apiServer";
+import {
+  getAbsenceBalances,
+  getCurrentUser,
+  getRemaningAbsences,
+} from "@/lib/apiServer";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -27,6 +31,7 @@ export default async function TimeLogs({
   const page = parseInt(searchParams?.page || "1");
   const currentUser = await getCurrentUser();
   const absenceBalances = await getAbsenceBalances(page);
+  const remainingAbsences = await getRemaningAbsences();
   return (
     <MainLayout currentUser={currentUser} active="absenses">
       <div className="flex items-center">
@@ -72,6 +77,7 @@ export default async function TimeLogs({
             : 0
         }
       />
+      Reamining: {remainingAbsences.value}
     </MainLayout>
   );
 }

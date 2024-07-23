@@ -36,6 +36,10 @@ class AbsenceBalanceDTO(ModelSchema):
         fields = "__all__"
 
 
+class RemainingAbsences(Schema):
+    value: int
+
+
 class ProjectDTO(ModelSchema):
     class Meta:
         model = Project

@@ -131,3 +131,17 @@ export async function getAbsenceBalances(
     return { count: 0, items: [] };
   }
 }
+
+export async function getRemaningAbsences(): Promise<
+  components["schemas"]["RemainingAbsences"]
+> {
+  try {
+    const res = await serverFetch("/api/absence-balances/remaining/");
+    if (!res.ok) return { value: 0 };
+    return await res.json();
+  } catch (err) {
+    if (isRedirectError(err)) throw err;
+    console.log(err);
+    return { value: 0 };
+  }
+}

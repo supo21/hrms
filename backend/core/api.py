@@ -5,6 +5,8 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from django.db.models import Sum
+from django.db.models.functions import Coalesce
 from django.http import HttpRequest
 from django.http import HttpResponse
 from django.utils import timezone
@@ -28,6 +30,7 @@ from core.schemas import GenericDTO
 from core.schemas import HolidayDTO
 from core.schemas import Login
 from core.schemas import ProjectDTO
+from core.schemas import RemainingAbsences
 from core.schemas import StartTimeLog
 from core.schemas import TimeLogDTO
 from core.schemas import UserDTO
@@ -177,6 +180,18 @@ def list_absence_balances(request: HttpRequest):
     else:
         objs = AbsenceBalance.objects.filter(user=request.user)
     return objs.order_by("-id")
+
+
+@api.get(
+    "/absence-balances/remaining/",
+    auth=django_auth,
+    response={200: RemainingAbsences},
+)
+def remaining_absences(request: HttpRequest):
+    obj = AbsenceBalance.objects.filter(user=request.user).aggregate(
+        value=Coalesce(Sum("delta"), 0)
+    )
+    return obj
 
 
 @api.post("/auth/login/", response={200: GenericDTO, 400: GenericDTO})

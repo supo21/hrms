@@ -191,6 +191,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/absence-balances/remaining/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Remaining Absences */
+        get: operations["core_api_remaining_absences"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/login/": {
         parameters: {
             query?: never;
@@ -498,6 +515,11 @@ export interface components {
             items: components["schemas"]["AbsenceBalanceDTO"][];
             /** Count */
             count: number;
+        };
+        /** RemainingAbsences */
+        RemainingAbsences: {
+            /** Value */
+            value: number;
         };
         /** Login */
         Login: {
@@ -818,6 +840,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PagedAbsenceBalanceDTO"];
+                };
+            };
+        };
+    };
+    core_api_remaining_absences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RemainingAbsences"];
                 };
             };
         };
