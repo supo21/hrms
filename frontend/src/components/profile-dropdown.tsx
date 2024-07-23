@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getCookie } from "@/lib/utils";
+import { components } from "@/lib/schema";
 
 async function logout() {
   const csrftoken = getCookie("csrftoken");
@@ -24,7 +25,11 @@ async function logout() {
   return res.ok;
 }
 
-export default function ProfileDropdown() {
+export default function ProfileDropdown({
+  currentUser,
+}: {
+  currentUser: components["schemas"]["UserDTO"];
+}) {
   const router = useRouter();
   return (
     <DropdownMenu>
@@ -35,7 +40,7 @@ export default function ProfileDropdown() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuLabel>{currentUser.username}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={async () => {

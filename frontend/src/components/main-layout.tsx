@@ -231,7 +231,7 @@ export default async function MainLayout({
                   </Link>
                 </Button>
               )}
-              <ProfileDropdown />
+              <ProfileDropdown currentUser={currentUser} />
             </div>
           </header>
           <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
