@@ -16,7 +16,7 @@ export default async function Settings() {
       <div className="flex items-center">
         <h1 className="text-lg font-semibold md:text-2xl">Settings</h1>
       </div>
-      <UpdatePasswordForm />
+      <UpdatePasswordForm currentUser={currentUser} />
     </MainLayout>
   );
 }

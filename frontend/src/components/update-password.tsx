@@ -1,4 +1,5 @@
 "use client";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,8 +8,13 @@ import { getCookie } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { toast } from "./ui/use-toast";
+import { components } from "@/lib/schema";
 
-export default function UpdatePasswordForm() {
+export default function UpdatePasswordForm({
+  currentUser,
+}: {
+  currentUser: components["schemas"]["UserDTO"];
+}) {
   const [password, setPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -71,6 +77,13 @@ export default function UpdatePasswordForm() {
   return (
     <form onSubmit={updatePassword}>
       <div className="grid gap-4 w-full max-w-[500px]">
+        <VisuallyHidden.Root>
+          <Input
+            id="username"
+            value={currentUser.username}
+            onChange={() => {}}
+          />
+        </VisuallyHidden.Root>
         <div className="grid gap-2">
           <Label htmlFor="password">Current Password</Label>
           <Input
