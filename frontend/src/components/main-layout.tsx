@@ -25,13 +25,9 @@ import {
 import ProfileDropdown from "./profile-dropdown";
 import TimeLogCard from "./time-log-card";
 import { Toaster } from "@/components/ui/toaster";
-import {
-  getActivities,
-  getCurrentTimeLog,
-  getCurrentUser,
-  getProjects,
-} from "@/lib/apiServer";
+import { getActivities, getCurrentTimeLog, getProjects } from "@/lib/apiServer";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+import { components } from "@/lib/schema";
 
 const activeLink =
   "flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary";
@@ -40,6 +36,7 @@ const inactiveLink =
 
 export default async function MainLayout({
   active,
+  currentUser,
   children,
 }: Readonly<{
   active:
@@ -49,11 +46,14 @@ export default async function MainLayout({
     | "holidays"
     | "absenses"
     | "settings";
+  currentUser: components["schemas"]["UserDTO"];
   children: React.ReactNode;
 }>) {
-  const [currentTimeLog, projects, activities, currentUser] = await Promise.all(
-    [getCurrentTimeLog(), getProjects(), getActivities(), getCurrentUser()]
-  );
+  const [currentTimeLog, projects, activities] = await Promise.all([
+    getCurrentTimeLog(),
+    getProjects(),
+    getActivities(),
+  ]);
 
   return (
     <>

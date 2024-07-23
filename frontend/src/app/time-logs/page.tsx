@@ -13,7 +13,7 @@ import Pagination from "@/components/pagination";
 import TimeLogStart from "@/components/time-log-start";
 import TimeLogEnd from "@/components/time-log-end";
 import CountUp from "@/components/count-up";
-import { getTimeLogs } from "@/lib/apiServer";
+import { getCurrentUser, getTimeLogs } from "@/lib/apiServer";
 
 export const metadata: Metadata = {
   title: "Time Logs - Sandbox HRMS",
@@ -29,8 +29,10 @@ export default async function TimeLogs({
 }) {
   const page = parseInt(searchParams?.page || "1");
   const timeLogs = await getTimeLogs(page);
+  const currentUser = await getCurrentUser();
+
   return (
-    <MainLayout active="time-logs">
+    <MainLayout currentUser={currentUser} active="time-logs">
       <div className="flex items-center">
         <h1 className="text-lg font-semibold md:text-2xl">Time Logs</h1>
       </div>

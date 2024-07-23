@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 import Pagination from "@/components/pagination";
-import { getHolidays } from "@/lib/apiServer";
+import { getCurrentUser, getHolidays } from "@/lib/apiServer";
 
 export const metadata: Metadata = {
   title: "Holidays - Sandbox HRMS",
@@ -26,9 +26,10 @@ export default async function TimeLogs({
 }) {
   const page = parseInt(searchParams?.page || "1");
   const holidays = await getHolidays(page);
+  const currentUser = await getCurrentUser();
 
   return (
-    <MainLayout active="holidays">
+    <MainLayout currentUser={currentUser} active="holidays">
       <div className="flex items-center">
         <h1 className="text-lg font-semibold md:text-2xl">Holidays</h1>
       </div>
