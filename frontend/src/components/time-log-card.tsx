@@ -19,7 +19,7 @@ export default function TimeLogCard({
   projects,
   activities,
 }: {
-  initial: components["schemas"]["TimeLogDTO"];
+  initial: components["schemas"]["TimeLogDTO"] | null;
   projects: components["schemas"]["PagedProjectDTO"];
   activities: components["schemas"]["PagedActivityDTO"];
 }) {
