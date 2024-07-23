@@ -87,3 +87,16 @@ class Login(Schema):
 class ChangePassword(Schema):
     current_password: str
     new_password: str
+
+
+class TimeLogSummaryPerDay(Schema):
+    date: datetime.date
+    expected_hours: int
+    hours_worked: float
+    weekday: str
+    holiday: str
+
+
+class TimeLogSummaryDTO(Schema):
+    user: str
+    summary: list[TimeLogSummaryPerDay]

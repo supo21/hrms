@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.contrib.auth import logout
@@ -34,6 +36,8 @@ from core.schemas import RemainingAbsences
 from core.schemas import StartTimeLog
 from core.schemas import SubmitAbsence
 from core.schemas import TimeLogDTO
+from core.schemas import TimeLogSummaryDTO
+from core.schemas import TimeLogSummaryPerDay
 from core.schemas import UserDTO
 
 api = NinjaAPI(docs_url="/docs/", csrf=True)
@@ -167,6 +171,71 @@ def end_time_log(request: HttpRequest):
         end=timezone.now()
     )
     return {"detail": "Success."}
+
+
+@api.get(
+    "/time-logs/summary/",
+    auth=django_auth,
+    response={200: list[TimeLogSummaryDTO]},
+)
+def time_log_summary(
+    request: HttpRequest, start: datetime.date, end: datetime.date
+):
+    # database
+    if request.user.is_superuser:  # type: ignore
+        users = User.objects.all()
+    else:
+        users = User.objects.filter(user=request.user)
+    logs = TimeLog.objects.filter(
+        start__date__gte=start,
+        start__date__lte=end,
+        end__isnull=False,
+        user__in=users,
+    ).values("user", "start", "end")
+    holidays = Holiday.objects.filter(date__gte=start, date__lte=end)
+
+    # data generation
+    holidays_map = {h.date: h.name for h in holidays}
+    output: list[TimeLogSummaryDTO] = []
+    for u in users:
+        user_data = TimeLogSummaryDTO(user=u.username, summary=[])
+        date = start
+        while date <= end:
+            logs_per_day = [
+                l
+                for l in logs
+                if l["start"].date() == date and l["user"] == u.pk
+            ]
+            hours_worked = (
+                sum(
+                    [
+                        (i["end"] - i["start"]).total_seconds()
+                        for i in logs_per_day
+                    ]
+                )
+                / 3600
+            )
+            weekday = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"][
+                date.weekday()
+            ]
+            if date in holidays_map:
+                holiday = holidays_map[date]
+                expected_hours = 0
+            else:
+                holiday = ""
+                expected_hours = getattr(u, f"expected_hours_{weekday}")
+            user_data.summary.append(
+                TimeLogSummaryPerDay(
+                    date=date,
+                    hours_worked=hours_worked,
+                    weekday=weekday,
+                    expected_hours=expected_hours,
+                    holiday=holiday,
+                )
+            )
+            date += datetime.timedelta(days=1)
+        output.append(user_data)
+    return output
 
 
 @api.get(
