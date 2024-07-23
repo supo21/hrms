@@ -12,6 +12,8 @@ import { UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getCookie } from "@/lib/utils";
 import { components } from "@/lib/schema";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import Link from "next/link";
 
 async function logout() {
   const csrftoken = getCookie("csrftoken");
@@ -34,14 +36,23 @@ export default function ProfileDropdown({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="">
-          <UserRound className="h-5 w-5" />
-          <span className="sr-only">Toggle user menu</span>
+        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+          <Avatar>
+            <AvatarImage />
+            <AvatarFallback>
+              {currentUser.username.slice(0, 1).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>{currentUser.username}</DropdownMenuLabel>
         <DropdownMenuSeparator />
+        {currentUser?.is_superuser && (
+          <DropdownMenuItem onClick={() => router.push("/admin/")}>
+            Admin
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem
           onClick={async () => {
             if (await logout()) router.push("/login/");

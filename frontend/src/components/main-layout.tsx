@@ -224,13 +224,6 @@ export default async function MainLayout({
               </form>
             </div>
             <div className="flex items-center gap-[2px]">
-              {currentUser?.is_superuser && (
-                <Button variant="ghost" className="p-3" asChild>
-                  <Link href="/admin/">
-                    <ExternalLink className="h-5 w-5 cursor-pointer" />
-                  </Link>
-                </Button>
-              )}
               <ProfileDropdown currentUser={currentUser} />
             </div>
           </header>
