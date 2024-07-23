@@ -1,3 +1,5 @@
+import datetime
+
 from ninja import Field
 from ninja import ModelSchema
 from ninja import Schema
@@ -38,6 +40,11 @@ class AbsenceBalanceDTO(ModelSchema):
 
 class RemainingAbsences(Schema):
     value: int
+
+
+class SubmitAbsence(Schema):
+    description: str
+    date: datetime.date
 
 
 class ProjectDTO(ModelSchema):

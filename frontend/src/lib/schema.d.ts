@@ -208,6 +208,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/absence-balances/submit/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit Absence */
+        post: operations["core_api_submit_absence"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/login/": {
         parameters: {
             query?: never;
@@ -520,6 +537,16 @@ export interface components {
         RemainingAbsences: {
             /** Value */
             value: number;
+        };
+        /** SubmitAbsence */
+        SubmitAbsence: {
+            /** Description */
+            description: string;
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
         };
         /** Login */
         Login: {
@@ -860,6 +887,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RemainingAbsences"];
+                };
+            };
+        };
+    };
+    core_api_submit_absence: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubmitAbsence"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericDTO"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericDTO"];
                 };
             };
         };

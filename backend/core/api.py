@@ -32,6 +32,7 @@ from core.schemas import Login
 from core.schemas import ProjectDTO
 from core.schemas import RemainingAbsences
 from core.schemas import StartTimeLog
+from core.schemas import SubmitAbsence
 from core.schemas import TimeLogDTO
 from core.schemas import UserDTO
 
@@ -127,7 +128,7 @@ def list_time_logs(request: HttpRequest):
 @api.get(
     "/time-logs/current/",
     auth=django_auth,
-    response={404: GenericDTO, 200: TimeLogDTO},
+    response={200: TimeLogDTO, 404: GenericDTO},
 )
 def current_time_log(request: HttpRequest):
     obj = TimeLog.objects.filter(user=request.user, end=None).first()
@@ -192,6 +193,27 @@ def remaining_absences(request: HttpRequest):
         value=Coalesce(Sum("delta"), 0)
     )
     return obj
+
+
+@api.post(
+    "/absence-balances/submit/",
+    auth=django_auth,
+    response={200: GenericDTO, 400: GenericDTO},
+)
+def submit_absence(request: HttpRequest, data: SubmitAbsence):
+    obj = AbsenceBalance.objects.filter(user=request.user).aggregate(
+        value=Coalesce(Sum("delta"), 0)
+    )
+    if obj["value"] < 1:
+        return 400, {"detail": "You have no absence balance."}
+    AbsenceBalance.objects.create(
+        user=request.user,
+        date=data.date,
+        description=data.description,
+        delta=-1,
+        created_by=request.user,
+    )
+    return 400, {"detail": "Success."}
 
 
 @api.post("/auth/login/", response={200: GenericDTO, 400: GenericDTO})
