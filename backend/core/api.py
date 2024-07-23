@@ -90,19 +90,15 @@ def create_user(request: HttpRequest, user: CreateUser):
 
 
 @api.post(
-    "/users/change-password/", response={200: GenericDTO, 400: GenericDTO}
+    "/users/change-password/",
+    auth=django_auth,
+    response={200: GenericDTO, 400: GenericDTO},
 )
 def change_password(request: HttpRequest, data: ChangePassword):
     user = request.user
-
-    if not user.is_authenticated:
-        return 403, {"detail": "User is not authenticated."}
-
     if not user.check_password(data.current_password):
         return 400, {"detail": "Current password is incorrect."}
-
     validate_password(data.new_password)
-
     user.set_password(data.new_password)
     user.save()
     update_session_auth_hash(request, user)  # type: ignore
