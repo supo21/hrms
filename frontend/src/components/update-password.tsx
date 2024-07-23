@@ -52,6 +52,7 @@ export default function UpdatePasswordForm() {
         toast({
           title: "Password changed successfully.",
         });
+        setLoading(false);
       } else if (res.status === 400) {
         setError("Invalid credentails.");
         setLoading(false);
@@ -103,7 +104,12 @@ export default function UpdatePasswordForm() {
         {error ? (
           <p className="text-[0.8rem] font-medium text-destructive">{error}</p>
         ) : null}
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={loading}
+          loading={loading}
+        >
           Update Password
         </Button>
       </div>
