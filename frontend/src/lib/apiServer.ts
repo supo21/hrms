@@ -114,3 +114,20 @@ export async function getTimeLogs(
     return { count: 0, items: [] };
   }
 }
+
+export async function getAbsenceBalances(
+  page: number = 1,
+  limit: number = 10
+): Promise<components["schemas"]["PagedAbsenceBalanceDTO"]> {
+  try {
+    const res = await serverFetch(
+      `/api/absence-balances/?limit=${limit}&offset=${(page - 1) * limit}`
+    );
+    if (!res.ok) return { count: 0, items: [] };
+    return await res.json();
+  } catch (err) {
+    if (isRedirectError(err)) throw err;
+    console.log(err);
+    return { count: 0, items: [] };
+  }
+}

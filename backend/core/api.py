@@ -14,11 +14,13 @@ from ninja import NinjaAPI
 from ninja.pagination import paginate  # type: ignore
 from ninja.security import django_auth
 
+from core.models import AbsenceBalance
 from core.models import Activity
 from core.models import Holiday
 from core.models import Project
 from core.models import TimeLog
 from core.models import User
+from core.schemas import AbsenceBalanceDTO
 from core.schemas import ActivityDTO
 from core.schemas import ChangePassword
 from core.schemas import CreateUser
@@ -161,6 +163,20 @@ def end_time_log(request: HttpRequest):
         end=timezone.now()
     )
     return {"detail": "Success."}
+
+
+@api.get(
+    "/absence-balances/",
+    auth=django_auth,
+    response={200: list[AbsenceBalanceDTO]},
+)
+@paginate
+def list_absence_balances(request: HttpRequest):
+    if request.user.is_superuser:  # type: ignore
+        objs = AbsenceBalance.objects.all()
+    else:
+        objs = AbsenceBalance.objects.filter(user=request.user)
+    return objs.order_by("-id")
 
 
 @api.post("/auth/login/", response={200: GenericDTO, 400: GenericDTO})

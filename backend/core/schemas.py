@@ -3,6 +3,7 @@ from ninja import ModelSchema
 from ninja import Schema
 from pydantic import Field
 
+from core.models import AbsenceBalance
 from core.models import Activity
 from core.models import Holiday
 from core.models import Project
@@ -23,6 +24,15 @@ class TimeLogDTO(ModelSchema):
 
     class Meta:
         model = TimeLog
+        fields = "__all__"
+
+
+class AbsenceBalanceDTO(ModelSchema):
+    user__username: str = Field(..., alias="user.username")
+    created_by__username: str = Field(..., alias="created_by.username")
+
+    class Meta:
+        model = AbsenceBalance
         fields = "__all__"
 
 

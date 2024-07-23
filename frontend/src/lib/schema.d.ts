@@ -174,6 +174,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/absence-balances/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Absence Balances */
+        get: operations["core_api_list_absence_balances"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/login/": {
         parameters: {
             query?: never;
@@ -442,6 +459,45 @@ export interface components {
             project: number;
             /** Activity */
             activity: number;
+        };
+        /** AbsenceBalanceDTO */
+        AbsenceBalanceDTO: {
+            /** User  Username */
+            user__username: string;
+            /** Created By  Username */
+            created_by__username: string;
+            /** ID */
+            id?: number | null;
+            /**
+             * Date Created
+             * Format: date-time
+             */
+            date_created: string;
+            /**
+             * Date Modified
+             * Format: date-time
+             */
+            date_modified: string;
+            /** User */
+            user: number;
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Description */
+            description: string;
+            /** Delta */
+            delta: number;
+            /** Created By */
+            created_by: number;
+        };
+        /** PagedAbsenceBalanceDTO */
+        PagedAbsenceBalanceDTO: {
+            /** Items */
+            items: components["schemas"]["AbsenceBalanceDTO"][];
+            /** Count */
+            count: number;
         };
         /** Login */
         Login: {
@@ -739,6 +795,29 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["GenericDTO"];
+                };
+            };
+        };
+    };
+    core_api_list_absence_balances: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedAbsenceBalanceDTO"];
                 };
             };
         };
