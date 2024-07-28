@@ -61,11 +61,9 @@ export default async function TimeLogs({
                   <TimeLogEnd end={i.end} />
                 </TableCell>
                 <TableCell className="whitespace-nowrap">
-                  {i.end ? (
-                    getDuration(new Date(i.start), new Date(i.end))
-                  ) : (
-                    <CountUp date={new Date(i.start)} title="time-logs" />
-                  )}
+                  {i.end
+                    ? getDuration(new Date(i.start), new Date(i.end))
+                    : getDuration(new Date(i.start), new Date())}
                 </TableCell>
                 <TableCell className="whitespace-nowrap">
                   {i.project__name}
