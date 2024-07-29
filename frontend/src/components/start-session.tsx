@@ -19,6 +19,7 @@ import {
 import { components } from "@/lib/schema";
 import { useState } from "react";
 import { toast } from "./ui/use-toast";
+import { Play } from "lucide-react";
 
 interface Props {
   onSubmit: (projectId: number, activityId: number) => void;
@@ -37,8 +38,12 @@ export function StartSession({ onSubmit, projects, activities }: Props) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button size="sm" className="w-full">
-          Start Session
+        <Button
+          variant="outline"
+          className="inline-flex gap-2 items-center border rounded-md h-9 px-2 cursor-pointer"
+        >
+          <Play size={14} />
+          <div>0h0m</div>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
