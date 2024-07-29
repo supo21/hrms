@@ -17,6 +17,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from ninja import NinjaAPI
 from ninja.pagination import paginate  # type: ignore
 from ninja.security import django_auth
+from ninja.security import django_auth_superuser
 
 from core.models import AbsenceBalance
 from core.models import Activity
@@ -26,6 +27,7 @@ from core.models import TimeLog
 from core.models import User
 from core.schemas import AbsenceBalanceDTO
 from core.schemas import ActivityDTO
+from core.schemas import AddHoliday
 from core.schemas import ChangePassword
 from core.schemas import CreateActivity
 from core.schemas import CreateProject
@@ -355,3 +357,13 @@ def auth_logout(request: HttpRequest):
 @paginate
 def list_holidays(request: HttpRequest):
     return Holiday.objects.all().order_by("-id")
+
+
+@api.post(
+    "/holidays/",
+    auth=django_auth_superuser,
+    response={200: GenericDTO, 400: GenericDTO},
+)
+def create_holiday(request: HttpRequest, data: AddHoliday):
+    Holiday.objects.create(name=data.name, date=data.date)
+    return 200, {"detail": "Success."}
