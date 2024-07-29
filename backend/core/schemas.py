@@ -1,4 +1,5 @@
 import datetime
+from typing import Optional
 
 from ninja import Field
 from ninja import ModelSchema
@@ -109,6 +110,16 @@ class CreateProject(Schema):
 
 class CreateActivity(Schema):
     activity: str
+
+
+class TimeLogIds(Schema):
+    time_log_ids: list[int]
+
+
+class EditTimeLogs(Schema):
+    time_log_ids: list[int]
+    activity_id: Optional[int] = None
+    project_id: Optional[int] = None
 
 
 class AddHoliday(Schema):

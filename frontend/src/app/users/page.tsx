@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Pagination from "@/components/pagination";
+import TableEmptyState from "@/components/table-empty-state";
 
 export default async function Users({
   searchParams,
@@ -73,11 +74,7 @@ export default async function Users({
             ))}
           </TableBody>
         ) : (
-          <TableBody>
-            <TableRow className="text-center h-40 hover:bg-none text-muted-foreground">
-              <TableCell colSpan={7}>No users found.</TableCell>
-            </TableRow>
-          </TableBody>
+          <TableEmptyState colSpan={7} message="No users found." />
         )}
       </Table>
       <Pagination

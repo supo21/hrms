@@ -32,6 +32,7 @@ from core.schemas import ChangePassword
 from core.schemas import CreateActivity
 from core.schemas import CreateProject
 from core.schemas import CreateUser
+from core.schemas import EditTimeLogs
 from core.schemas import GenericDTO
 from core.schemas import HolidayDTO
 from core.schemas import Login
@@ -40,6 +41,7 @@ from core.schemas import RemainingAbsences
 from core.schemas import StartTimeLog
 from core.schemas import SubmitAbsence
 from core.schemas import TimeLogDTO
+from core.schemas import TimeLogIds
 from core.schemas import TimeLogSummaryDTO
 from core.schemas import TimeLogSummaryPerDay
 from core.schemas import UserDTO
@@ -283,6 +285,40 @@ def time_log_summary(
             date += datetime.timedelta(days=1)
         output.append(user_data)
     return output
+
+
+@api.post(
+    "/time-logs/edit/",
+    auth=django_auth_superuser,
+    response={200: GenericDTO, 400: GenericDTO},
+)
+def update_time_logs(request: HttpRequest, data: EditTimeLogs):
+    time_logs = TimeLog.objects.filter(id__in=data.time_log_ids)
+    update_fields = {}
+
+    if data.activity_id is not None:
+        update_fields["activity_id"] = data.activity_id
+    if data.project_id is not None:
+        update_fields["project_id"] = data.project_id
+
+    try:
+        updated_count = time_logs.update(**update_fields)
+        return 200, {
+            "detail": f"{updated_count} time log item(s) updated successfully."
+        }
+    except IntegrityError:
+        return 400, {"detail": f"Invalid payload."}
+
+
+@api.post(
+    "/time-logs/delete/",
+    auth=django_auth_superuser,
+    response={200: GenericDTO, 400: GenericDTO},
+)
+def delete_time_logs(request: HttpRequest, data: TimeLogIds):
+    time_logs = TimeLog.objects.filter(id__in=data.time_log_ids)
+    count, _ = time_logs.delete()
+    return 200, {"detail": f"{count} time log item(s) deleted successfully."}
 
 
 @api.get(
