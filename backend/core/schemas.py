@@ -137,3 +137,8 @@ class AddHoliday(Schema):
 
 class EndSessionUserIds(Schema):
     user_ids: list[int]
+
+
+class AvailableCountries(Schema):
+    country_code: str
+    name: str
