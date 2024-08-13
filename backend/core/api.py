@@ -1,5 +1,7 @@
 import datetime
 import httpx
+from datetime import timedelta
+from typing import Union
 
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
@@ -9,11 +11,18 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.db.models import Sum
+from django.db.models import F
+from django.db.models import ExpressionWrapper
+from django.db.models import DurationField
+from django.db.models import Case
+from django.db.models import When
+from django.db.models import Value
 from django.db.models.functions import Coalesce
 from django.http import HttpRequest
 from django.http import HttpResponse
 from django.shortcuts import get_list_or_404
 from django.utils import timezone
+from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
 from ninja import NinjaAPI
@@ -51,6 +60,7 @@ from core.schemas import UserDTO
 from core.schemas import UserListDTO
 from core.schemas import AvailableCountries
 from core.schemas import ImportHolidays
+from core.schemas import WorkingHoursSummary
 
 api = NinjaAPI(docs_url="/docs/", csrf=True)
 
@@ -453,9 +463,9 @@ async def available_countries(request: HttpRequest):
 
 
 @api.post(
-        "/holidays/import/",
-        auth=django_auth_superuser,   
-        response={200: list[HolidayDTO], 400: GenericDTO},
+    "/holidays/import/",
+    auth=django_auth_superuser,
+    response={200: list[HolidayDTO], 400: GenericDTO},
 )
 def import_holidays(request: HttpRequest, data: ImportHolidays):
     url = f"https://date.nager.at/Api/v3/PublicHolidays/{data.year}/{data.country_code}"
@@ -465,13 +475,121 @@ def import_holidays(request: HttpRequest, data: ImportHolidays):
             response = client.get(url)
             response.raise_for_status()
             holidays = response.json()
-            
+
             holiday_objects = [
                 Holiday(name=holiday["name"], date=holiday["date"])
                 for holiday in holidays
             ]
 
-            created_holidays = Holiday.objects.bulk_create(holiday_objects)            
+            created_holidays = Holiday.objects.bulk_create(holiday_objects)
         return 200, created_holidays
     except httpx.HTTPError as e:
         return 400, {"detail": f"HTTP error occured: {str(e)}."}
+
+
+@api.get(
+    "/working-hours-summary/",
+    response={200: WorkingHoursSummary, 400: GenericDTO},
+    auth=django_auth,
+)
+def working_hours_summary(request: HttpRequest):
+    today = now().date()
+    start_of_week = now() - timedelta(days=now().weekday())
+    start_of_month = now().replace(day=1)
+    start_of_year = now().replace(month=1, day=1)
+    past_30_days = now() - timedelta(days=30)
+
+    working_hours_queryset = TimeLog.objects.filter(user=request.user)
+
+    aggregations = working_hours_queryset.aggregate(
+        hours_today=Sum(
+            Case(
+                When(
+                    start__date=today,
+                    then=ExpressionWrapper(
+                        F("end") - F("start"), output_field=DurationField()
+                    ),
+                ),
+                default=Value(timedelta(0)),
+                output_field=DurationField(),
+            )
+        ),
+        hours_this_week=Sum(
+            Case(
+                When(
+                    start__gte=start_of_week,
+                    then=ExpressionWrapper(
+                        F("end") - F("start"), output_field=DurationField()
+                    ),
+                ),
+                default=Value(timedelta(0)),
+                output_field=DurationField(),
+            )
+        ),
+        hours_this_month=Sum(
+            Case(
+                When(
+                    start__gte=start_of_month,
+                    then=ExpressionWrapper(
+                        F("end") - F("start"), output_field=DurationField()
+                    ),
+                ),
+                default=Value(timedelta(0)),
+                output_field=DurationField(),
+            )
+        ),
+        hours_this_year=Sum(
+            Case(
+                When(
+                    start__gte=start_of_year,
+                    then=ExpressionWrapper(
+                        F("end") - F("start"), output_field=DurationField()
+                    ),
+                ),
+                default=Value(timedelta(0)),
+                output_field=DurationField(),
+            )
+        ),
+    )
+
+    working_hours_graph = (
+        working_hours_queryset.filter(start__gte=past_30_days)
+        .values("start__date")
+        .annotate(
+            hours=Sum(
+                ExpressionWrapper(
+                    F("end") - F("start"), output_field=DurationField()
+                )
+            )
+        )
+        .order_by("start__date")
+    )
+
+    def timedelta_to_hours(td: Union[timedelta, int]) -> float:
+        if isinstance(td, timedelta):
+            return td.total_seconds() / 3600
+        elif td == 0:
+            return 0.0
+        raise ValueError("Invalid input for timedelta_to_hours")
+
+    graph_data = [
+        {
+            "date": item["start__date"],
+            "hours_worked": timedelta_to_hours(item["hours"]),
+        }
+        for item in working_hours_graph
+    ]
+
+    return {
+        "working_hours_today": timedelta_to_hours(aggregations["hours_today"]),
+        "working_hours_this_week": timedelta_to_hours(
+            aggregations["hours_this_week"]
+        ),
+        "working_hours_this_month": timedelta_to_hours(
+            aggregations["hours_this_month"]
+        ),
+        "working_hours_this_year": timedelta_to_hours(
+            aggregations["hours_this_year"]
+        ),
+        "working_hours_graph": graph_data,
+    }
