@@ -2,7 +2,7 @@ import dramatiq
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.utils import timezone
-from dramatiq_crontab import cron
+from dramatiq_crontab import cron  # type: ignore
 
 from core.models import AbsenceBalance
 from core.models import Settings
@@ -38,6 +38,6 @@ def absence_balance_credit():
 
 
 @cron("0 0 1 * *")
-@dramatiq.actor
+@dramatiq.actor  # type: ignore
 def absence_balance_credit_cron():
     absence_balance_credit()
