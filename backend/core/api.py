@@ -502,65 +502,80 @@ def working_hours_summary(request: HttpRequest, start_date: datetime.date):
     working_hours_queryset = TimeLog.objects.filter(user=request.user)
 
     aggregations = working_hours_queryset.aggregate(
-        hours_today=Sum(
-            Case(
-                When(
-                    start__date=today,
-                    then=ExpressionWrapper(
-                        F("end") - F("start"), output_field=DurationField()
+        hours_today=Coalesce(
+            Sum(
+                Case(
+                    When(
+                        start__date=today,
+                        then=ExpressionWrapper(
+                            F("end") - F("start"), output_field=DurationField()
+                        ),
                     ),
-                ),
-                default=Value(timedelta(0)),
-                output_field=DurationField(),
-            )
+                    default=Value(timedelta(0)),
+                    output_field=DurationField(),
+                )
+            ),
+            timedelta(0),
         ),
-        hours_this_week=Sum(
-            Case(
-                When(
-                    start__gte=start_of_week,
-                    then=ExpressionWrapper(
-                        F("end") - F("start"), output_field=DurationField()
+        hours_this_week=Coalesce(
+            Sum(
+                Case(
+                    When(
+                        start__gte=start_of_week,
+                        then=ExpressionWrapper(
+                            F("end") - F("start"), output_field=DurationField()
+                        ),
                     ),
-                ),
-                default=Value(timedelta(0)),
-                output_field=DurationField(),
-            )
+                    default=Value(timedelta(0)),
+                    output_field=DurationField(),
+                )
+            ),
+            timedelta(0),
         ),
-        hours_this_month=Sum(
-            Case(
-                When(
-                    start__gte=start_of_month,
-                    then=ExpressionWrapper(
-                        F("end") - F("start"), output_field=DurationField()
+        hours_this_month=Coalesce(
+            Sum(
+                Case(
+                    When(
+                        start__gte=start_of_month,
+                        then=ExpressionWrapper(
+                            F("end") - F("start"), output_field=DurationField()
+                        ),
                     ),
-                ),
-                default=Value(timedelta(0)),
-                output_field=DurationField(),
-            )
+                    default=Value(timedelta(0)),
+                    output_field=DurationField(),
+                )
+            ),
+            timedelta(0),
         ),
-        hours_this_year=Sum(
-            Case(
-                When(
-                    start__gte=start_of_year,
-                    then=ExpressionWrapper(
-                        F("end") - F("start"), output_field=DurationField()
+        hours_this_year=Coalesce(
+            Sum(
+                Case(
+                    When(
+                        start__gte=start_of_year,
+                        then=ExpressionWrapper(
+                            F("end") - F("start"), output_field=DurationField()
+                        ),
                     ),
-                ),
-                default=Value(timedelta(0)),
-                output_field=DurationField(),
-            )
+                    default=Value(timedelta(0)),
+                    output_field=DurationField(),
+                )
+            ),
+            timedelta(0),
         ),
     )
 
     working_hours_graph = (
-        working_hours_queryset.filter(start__gte=start_date)
+        working_hours_queryset.filter(start__date__gte=start_date)
         .values("start__date")
         .annotate(
-            hours=Sum(
-                ExpressionWrapper(
-                    F("end") - F("start"), output_field=DurationField()
-                )
-            )
+            hours=Coalesce(
+                Sum(
+                    ExpressionWrapper(
+                        F("end") - F("start"), output_field=DurationField()
+                    )
+                ),
+                timedelta(0),
+            ),
         )
         .order_by("start__date")
     )
