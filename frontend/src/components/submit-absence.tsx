@@ -14,18 +14,16 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { toast } from "./ui/use-toast";
 import { Input } from "./ui/input";
-import { DatePicker } from "./date-picker";
+
 import { getCookie } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
+import { DatePickerWithRange } from "./date-range-picker";
+import { DateRange } from "react-day-picker";
 
-interface Props {
-  remainigAbsences: number;
-}
-
-export function SubmitAbsence({ remainigAbsences }: Props) {
+export function SubmitAbsence() {
   const router = useRouter();
-  const [date, setDate] = useState<Date | undefined>();
+  const [date, setDate] = useState<DateRange | undefined>();
   const [reason, setReason] = useState<string>("");
 
   const submitAbsence = async () => {
@@ -36,12 +34,17 @@ export function SubmitAbsence({ remainigAbsences }: Props) {
       return;
     }
 
-    if (date && new Date() < date) {
+    if (!date?.from) {
       toast({
         title: "Please select a valid date.",
       });
       return;
     }
+
+    // set date.to as date.from when
+    // only date.from is selected
+    // aka single date
+    const to = date.to || date.from;
 
     try {
       const csrftoken = getCookie("csrftoken");
@@ -52,17 +55,27 @@ export function SubmitAbsence({ remainigAbsences }: Props) {
           "X-CSRFToken": csrftoken,
         },
         body: JSON.stringify({
-          date: date && format(date, "yyyy-MM-dd"),
+          start: format(date.from, "yyyy-MM-dd"),
+          end: format(to, "yyyy-MM-dd"),
           description: reason,
         }),
       });
       if (res.ok) {
         toast({
-          title: "Absence submited successfully.",
+          title: (await res.json()).detail,
         });
         router.refresh();
+      } else if (res.status === 401) {
+        router.push("/login/");
+      } else if (res.status === 400) {
+        toast({
+          title: (await res.json()).detail,
+        });
+      } else {
+        toast({
+          title: "Unexpected error occured.",
+        });
       }
-      if (res.status === 401) router.push("/login/");
     } catch (err) {
       toast({
         title: "Something went wrong.",
@@ -73,11 +86,7 @@ export function SubmitAbsence({ remainigAbsences }: Props) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          size="sm"
-          className="w-full"
-          disabled={!Boolean(remainigAbsences)}
-        >
+        <Button size="sm" className="w-full">
           Submit Absence
         </Button>
       </DialogTrigger>
@@ -104,7 +113,7 @@ export function SubmitAbsence({ remainigAbsences }: Props) {
             <Label htmlFor="date" className="text-left max-w-[70px] w-full">
               Date
             </Label>
-            <DatePicker date={date} onChange={(v) => setDate(v)} />
+            <DatePickerWithRange date={date} onChange={(d) => setDate(d)} />
           </div>
         </div>
         <DialogFooter>

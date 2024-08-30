@@ -43,7 +43,7 @@ export default async function TimeLogs({
             <Calendar size={14} />
             Absence Balance: {remainingAbsences.value}
           </span>
-          <SubmitAbsence remainigAbsences={remainingAbsences?.value} />
+          <SubmitAbsence />
         </div>
       </div>
       <Table>

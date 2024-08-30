@@ -1,9 +1,9 @@
 "use client";
 
+import * as React from "react";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
-import { useRouter, useSearchParams } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -13,45 +13,25 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useEffect, useState } from "react";
-
-interface Props {
-  className?: React.HTMLAttributes<HTMLDivElement>;
-  initialFrom?: string;
-  initialTo?: string;
-}
 
 export function DatePickerWithRange({
+  date,
+  onChange,
   className,
-  initialFrom,
-  initialTo,
-}: Props) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const [date, setDate] = useState<DateRange | undefined>(() => {
-    const from = searchParams.get("start") || initialFrom;
-    const to = searchParams.get("end") || initialTo;
-    return from && to ? { from: new Date(from), to: new Date(to) } : undefined;
-  });
-
-  useEffect(() => {
-    if (date?.from && date?.to) {
-      const fromStr = format(date.from, "yyyy-MM-dd");
-      const toStr = format(date.to, "yyyy-MM-dd");
-      router.push(`?start=${fromStr}&end=${toStr}`);
-    }
-  }, [date, router]);
-
+}: {
+  date?: DateRange;
+  onChange: (date: DateRange | undefined) => void;
+  className?: React.HTMLAttributes<HTMLDivElement>;
+}) {
   return (
-    <div className={cn("grid gap-2", className)}>
+    <div className={cn("w-full grid gap-2", className)}>
       <Popover>
         <PopoverTrigger asChild>
           <Button
             id="date"
             variant={"outline"}
             className={cn(
-              "w-[280px] justify-start text-left font-normal",
+              "justify-start text-left font-normal",
               !date && "text-muted-foreground"
             )}
           >
@@ -76,8 +56,8 @@ export function DatePickerWithRange({
             mode="range"
             defaultMonth={date?.from}
             selected={date}
-            onSelect={setDate}
-            numberOfMonths={1}
+            onSelect={onChange}
+            numberOfMonths={2}
           />
         </PopoverContent>
       </Popover>
