@@ -296,6 +296,11 @@ def time_log_summary(
             ]
 
             holiday = holidays_map.get(date, "")
+            # if there is no existing holiday in saturday, mark holiday as saturday
+            # TODO: add option to make sunday holiday
+            # add a field in settings to choose if saturday and sunday are holidays
+            if weekday == "sat" and not holiday:
+                holiday = "Saturday"
             absence = absences_map.get(f"{date}_{u.username}", "")
             expected_hours = (
                 0
