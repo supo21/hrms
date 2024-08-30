@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { components } from "@/lib/schema";
 import DateFilter from "./_components/date-filter";
+import { TooltipCell } from "./_components/tooltip-cell";
 
 export const metadata: Metadata = {
   title: "Time Summary - Sandbox HRMS",
@@ -182,41 +183,43 @@ export default async function TimeSummary({
                           (item) => item.date === format(date, "yyyy-MM-dd")
                         );
                         if (!dayData || new Date(dayData?.date) > new Date())
-                          return null;
+                          return <TableCell key={date.toISOString()} />;
 
                         const difference =
                           (dayData?.hours_worked || 0) -
                           (dayData?.expected_hours || 0);
 
-                        const sign =
-                          showDifference &&
-                          !dayData?.holiday &&
-                          !dayData?.absence
-                            ? new Intl.NumberFormat("en-US", {
-                                signDisplay: "exceptZero",
-                              }).format(difference)[0]
-                            : null;
+                        const sign = difference >= 0 ? "+" : "-";
+
+                        const content = dayData?.holiday ? (
+                          <TooltipCell
+                            trigger="Holiday"
+                            content={dayData?.holiday}
+                          />
+                        ) : dayData?.absence ? (
+                          <TooltipCell
+                            trigger="Time Off"
+                            content={dayData?.absence}
+                          />
+                        ) : showDifference ? (
+                          sign + convertHoursToHHMM(Math.abs(difference))
+                        ) : dayData?.hours_worked ? (
+                          convertHoursToHHMM(dayData?.hours_worked)
+                        ) : (
+                          "Absent"
+                        );
 
                         return (
                           <TableCell
                             key={date.toISOString()}
-                            className={cn("whitespace-nowrap", {
-                              "bg-muted":
-                                dayData?.holiday.length ||
-                                dayData?.absence?.length,
-                              "text-green-600":
-                                showDifference && difference >= 0,
-                              "text-red-600": showDifference && difference < 0,
-                            })}
+                            className={cn(
+                              "whitespace-nowrap",
+                              content === "Absent" || sign === "-"
+                                ? "text-red-600"
+                                : "text-green-600"
+                            )}
                           >
-                            {sign}
-                            {dayData?.holiday || dayData?.absence
-                              ? ""
-                              : showDifference
-                              ? convertHoursToHHMM(Math.abs(difference))
-                              : dayData?.hours_worked
-                              ? convertHoursToHHMM(dayData?.hours_worked)
-                              : ""}
+                            {content}
                           </TableCell>
                         );
                       })}
