@@ -1,6 +1,12 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.db.models import F
+from django.db.models import ExpressionWrapper
+from django.db.models import fields
+from django.db.models.functions import Coalesce
+from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
+from django.utils.timezone import now
 
 from core.models import AbsenceBalance
 from core.models import Activity
@@ -58,7 +64,31 @@ class ActivityAdmin(admin.ModelAdmin[Activity]):
 @admin.register(TimeLog)
 class TimeLogAdmin(admin.ModelAdmin[TimeLog]):
     search_fields = ["user__username", "project__name", "activity__name"]
-    list_display = ["id", "user", "start", "end", "project", "activity"]
+    list_display = [
+        "id",
+        "user",
+        "start",
+        "end",
+        "duration",
+        "project",
+        "activity",
+    ]
+
+    def get_queryset(self, request: HttpRequest):
+        queryset = super().get_queryset(request)
+        queryset = queryset.annotate(
+            duration=ExpressionWrapper(
+                Coalesce(F("end"), now()) - F("start"),
+                output_field=fields.DurationField(),
+            )
+        )
+        return queryset
+
+    def duration(self, obj: TimeLog) -> str:
+        duration_value = getattr(obj, "duration")
+        hours, remainder = divmod(duration_value.total_seconds(), 3600)
+        minutes = remainder // 60
+        return f"{int(hours)}h{int(minutes)}m"
 
     class Meta:
         model = TimeLog
