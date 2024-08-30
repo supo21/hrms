@@ -30,6 +30,33 @@ export const metadata: Metadata = {
   description: "Human Resource Management System",
 };
 
+// This function returns the contents of cell in time summary
+// if "Show Difference" button is pressed
+function getCellContentDifference(
+  dayData: components["schemas"]["TimeLogSummaryPerDay"]
+) {
+  const difference =
+    (dayData.hours_worked || 0) - (dayData.expected_hours || 0);
+  const sign = difference >= 0 ? "+" : "-";
+  return sign + convertHoursToHHMM(Math.abs(difference));
+}
+
+// This function returns the contents of cell in time summary
+// if "Show Difference" button is not pressed
+function getCellContent(
+  dayData: components["schemas"]["TimeLogSummaryPerDay"]
+) {
+  return dayData.holiday ? (
+    <TooltipCell trigger="Holiday" content={dayData.holiday} />
+  ) : dayData.absence ? (
+    <TooltipCell trigger="Time Off" content={dayData.absence} />
+  ) : dayData.hours_worked ? (
+    convertHoursToHHMM(dayData.hours_worked)
+  ) : (
+    "Absent"
+  );
+}
+
 interface IWorkingHours {
   total: number;
   [date: string]: number;
@@ -186,35 +213,20 @@ export default async function TimeSummary({
                           return <TableCell key={date.toISOString()} />;
 
                         const difference =
-                          (dayData?.hours_worked || 0) -
-                          (dayData?.expected_hours || 0);
+                          (dayData.hours_worked || 0) -
+                          (dayData.expected_hours || 0);
 
-                        const sign = difference >= 0 ? "+" : "-";
-
-                        const content = dayData?.holiday ? (
-                          <TooltipCell
-                            trigger="Holiday"
-                            content={dayData?.holiday}
-                          />
-                        ) : dayData?.absence ? (
-                          <TooltipCell
-                            trigger="Time Off"
-                            content={dayData?.absence}
-                          />
-                        ) : showDifference ? (
-                          sign + convertHoursToHHMM(Math.abs(difference))
-                        ) : dayData?.hours_worked ? (
-                          convertHoursToHHMM(dayData?.hours_worked)
-                        ) : (
-                          "Absent"
-                        );
+                        const content = showDifference
+                          ? getCellContentDifference(dayData)
+                          : getCellContent(dayData);
 
                         return (
                           <TableCell
                             key={date.toISOString()}
                             className={cn(
                               "whitespace-nowrap",
-                              content === "Absent" || sign === "-"
+                              content === "Absent" ||
+                                (showDifference && difference < 0)
                                 ? "text-red-600"
                                 : "text-green-600"
                             )}
