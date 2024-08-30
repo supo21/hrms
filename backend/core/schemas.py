@@ -53,7 +53,8 @@ class RemainingAbsences(Schema):
 
 class SubmitAbsence(Schema):
     description: str
-    date: datetime.date
+    start: datetime.date
+    end: datetime.date
 
 
 class ProjectDTO(ModelSchema):

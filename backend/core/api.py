@@ -392,20 +392,51 @@ def remaining_absences(request: HttpRequest):
     response={200: GenericDTO, 400: GenericDTO},
 )
 def submit_absence(request: HttpRequest, data: SubmitAbsence):
-    obj = AbsenceBalance.objects.filter(user=request.user).aggregate(
-        value=Coalesce(Sum("delta"), 0.0)
-    )
-    if obj["value"] < 1:
-        return 400, {"detail": "You have no absence balance."}
+    existing_absences = AbsenceBalance.objects.filter(
+        user=request.user, date__gte=data.start, date__lte=data.end, delta=-1
+    ).values_list("date", flat=True)
+    holidays = Holiday.objects.filter(
+        date__gte=data.start, date__lte=data.end
+    ).values_list("date", flat=True)
 
-    AbsenceBalance.objects.create(
-        user=request.user,
-        date=data.date,
-        description=data.description,
-        delta=-1,
-        created_by=request.user,
-    )
-    return 200, {"detail": "Success."}
+    date = data.start
+    dates_to_submit: list[datetime.date] = []
+    while date <= data.end:
+        weekday = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"][
+            date.weekday()
+        ]
+        # TODO: add option to make sunday holiday
+        # add a field in settings to choose if saturday and sunday are holidays
+        if weekday == "sat" or date in holidays or date in existing_absences:
+            date += datetime.timedelta(days=1)
+            continue
+        dates_to_submit.append(date)
+
+        date += datetime.timedelta(days=1)
+
+    balance = AbsenceBalance.objects.filter(user=request.user).aggregate(
+        value=Coalesce(Sum("delta"), 0.0)
+    )["value"]
+    required = len(dates_to_submit)
+    if balance < required:
+        return 400, {
+            "detail": (
+                "You do not have enough balance, "
+                f"required={float(required)}, balance={balance}."
+            )
+        }
+    objs = [
+        AbsenceBalance(
+            user=request.user,
+            date=i,
+            description=data.description,
+            delta=-1,
+            created_by=request.user,
+        )
+        for i in dates_to_submit
+    ]
+    objs = AbsenceBalance.objects.bulk_create(objs)
+    return 200, {"detail": f"Successfully submitted {len(objs)} absences."}
 
 
 @api.post("/auth/login/", response={200: GenericDTO, 400: GenericDTO})
