@@ -264,7 +264,7 @@ def time_log_summary(
         users = User.objects.filter(id=request.user.pk, is_active=True)
         logs = logs.filter(user=request.user)
         absences = absences.filter(user=request.user)
-    logs = logs.values("user", "start", "end")
+    logs = logs.values("user", "start__date", "start", "end")
     holidays = Holiday.objects.filter(date__gte=start, date__lte=end)
 
     # data generation
@@ -280,7 +280,7 @@ def time_log_summary(
             logs_per_day = [
                 l
                 for l in logs
-                if l["start"].date() == date and l["user"] == u.pk
+                if l["start__date"] == date and l["user"] == u.pk
             ]
             hours_worked = (
                 sum(
