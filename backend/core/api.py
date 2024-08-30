@@ -392,6 +392,11 @@ def remaining_absences(request: HttpRequest):
     response={200: GenericDTO, 400: GenericDTO},
 )
 def submit_absence(request: HttpRequest, data: SubmitAbsence):
+    logs = TimeLog.objects.filter(
+        start__date__gte=data.start,
+        start__date__lte=data.end,
+        user=request.user,
+    ).values_list("start__date", flat=True)
     existing_absences = AbsenceBalance.objects.filter(
         user=request.user, date__gte=data.start, date__lte=data.end, delta=-1
     ).values_list("date", flat=True)
@@ -407,7 +412,12 @@ def submit_absence(request: HttpRequest, data: SubmitAbsence):
         ]
         # TODO: add option to make sunday holiday
         # add a field in settings to choose if saturday and sunday are holidays
-        if weekday == "sat" or date in holidays or date in existing_absences:
+        if (
+            weekday == "sat"
+            or date in holidays
+            or date in existing_absences
+            or date in logs
+        ):
             date += datetime.timedelta(days=1)
             continue
         dates_to_submit.append(date)
