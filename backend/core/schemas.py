@@ -82,6 +82,7 @@ class GenericDTO(Schema):
 class StartTimeLog(Schema):
     project: int
     activity: int
+    date: Optional[datetime.date] = None
 
 
 class CreateUser(Schema):
