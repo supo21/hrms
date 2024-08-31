@@ -1,12 +1,12 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.db.models import F
 from django.db.models import ExpressionWrapper
+from django.db.models import F
 from django.db.models import fields
 from django.db.models.functions import Coalesce
 from django.http import HttpRequest
-from django.utils.translation import gettext_lazy as _
 from django.utils.timezone import now
+from django.utils.translation import gettext_lazy as _
 
 from core.models import AbsenceBalance
 from core.models import Activity
@@ -67,6 +67,7 @@ class TimeLogAdmin(admin.ModelAdmin[TimeLog]):
     list_display = [
         "id",
         "user",
+        "date",
         "start",
         "end",
         "duration",

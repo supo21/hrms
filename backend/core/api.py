@@ -207,6 +207,7 @@ def start_time_log(request: HttpRequest, data: StartTimeLog):
             return 400, {"detail": "An active session already exists."}
         obj = TimeLog.objects.create(
             user=request.user,
+            date=timezone.localdate(),
             start=timezone.now(),
             end=None,
             project=Project.objects.get(id=data.project),
@@ -251,8 +252,8 @@ def time_log_summary(
 ):
     # database
     logs = TimeLog.objects.filter(
-        start__date__gte=start,
-        start__date__lte=end,
+        date__gte=start,
+        date__lte=end,
         end__isnull=False,
     )
     absences = AbsenceBalance.objects.filter(
@@ -264,7 +265,7 @@ def time_log_summary(
         users = User.objects.filter(id=request.user.pk, is_active=True)
         logs = logs.filter(user=request.user)
         absences = absences.filter(user=request.user)
-    logs = logs.values("user", "start__date", "start", "end")
+    logs = logs.values("user", "date", "start", "end")
     holidays = Holiday.objects.filter(date__gte=start, date__lte=end)
 
     # data generation
@@ -278,9 +279,7 @@ def time_log_summary(
         date = start
         while date <= end:
             logs_per_day = [
-                l
-                for l in logs
-                if l["start__date"] == date and l["user"] == u.pk
+                l for l in logs if l["date"] == date and l["user"] == u.pk
             ]
             hours_worked = (
                 sum(

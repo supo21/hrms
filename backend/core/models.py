@@ -65,6 +65,12 @@ class TimeLog(BaseModel):
     )
     start = models.DateTimeField()
     end = models.DateTimeField(blank=True, null=True)
+
+    # the default value of date is the date part of start
+    # but sometimes a user might cover the shift of other
+    # date in later date, in those cases start and date is
+    # different
+    date = models.DateField()
     project = models.ForeignKey(
         Project, on_delete=models.PROTECT, related_name="time_logs"
     )

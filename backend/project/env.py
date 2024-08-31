@@ -13,7 +13,7 @@ class Environment(BaseSettings):
     ALLOWED_HOSTS: str = "*"
     CSRF_TRUSTED_ORIGINS: str = "http://localhost:3000"
     SECRET_KEY: str = "STRONG_KEY"
-    TIME_ZONE: str = "UTC"
+    TIME_ZONE: str = "Asia/Kathmandu"
     DRAMATIQ_URL: str = "redis://localhost:6379"
 
 
