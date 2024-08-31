@@ -46,12 +46,12 @@ function getCellContentDifference(
 function getCellContent(
   dayData: components["schemas"]["TimeLogSummaryPerDay"]
 ) {
-  return dayData.holiday ? (
+  return dayData.hours_worked ? (
+    convertHoursToHHMM(dayData.hours_worked)
+  ) : dayData.holiday ? (
     <TooltipCell trigger="Holiday" content={dayData.holiday} />
   ) : dayData.absence ? (
     <TooltipCell trigger="Time Off" content={dayData.absence} />
-  ) : dayData.hours_worked ? (
-    convertHoursToHHMM(dayData.hours_worked)
   ) : (
     "Absent"
   );
