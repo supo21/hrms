@@ -85,6 +85,7 @@ class TimeLogAdmin(admin.ModelAdmin[TimeLog]):
         )
         return queryset
 
+    @admin.display(description="duration", ordering="duration")
     def duration(self, obj: TimeLog) -> str:
         duration_value = getattr(obj, "duration")
         hours, remainder = divmod(duration_value.total_seconds(), 3600)
