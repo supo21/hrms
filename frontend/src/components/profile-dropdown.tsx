@@ -53,7 +53,7 @@ export default function ProfileDropdown({
         {currentUser?.is_superuser && (
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => router.push("/admin/")}
+            onClick={() => window.open("/admin/")}
           >
             Admin
           </DropdownMenuItem>
