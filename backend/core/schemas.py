@@ -139,6 +139,15 @@ class AddHoliday(Schema):
     date: datetime.date
 
 
+class EditHoliday(Schema):
+    holiday_id: int
+    name: str
+    date: datetime.date
+
+
+class DeleteHoliday(Schema):
+    holiday_id: int
+
 class EndSessionUserIds(Schema):
     user_ids: list[int]
 

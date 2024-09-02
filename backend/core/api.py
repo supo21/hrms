@@ -44,7 +44,9 @@ from core.schemas import ChangePassword
 from core.schemas import CreateActivity
 from core.schemas import CreateProject
 from core.schemas import CreateUser
+from core.schemas import DeleteHoliday
 from core.schemas import EditTimeLogs
+from core.schemas import EditHoliday
 from core.schemas import EndSessionUserIds
 from core.schemas import GenericDTO
 from core.schemas import HolidayDTO
@@ -482,6 +484,36 @@ def list_holidays(request: HttpRequest):
 def create_holiday(request: HttpRequest, data: AddHoliday):
     Holiday.objects.create(name=data.name, date=data.date)
     return 200, {"detail": "Success."}
+
+
+@api.put(
+    "/holidays/edit/",
+    auth=django_auth_superuser,
+    response={200: GenericDTO, 404: GenericDTO},
+)
+def update_holiday(request: HttpRequest, data: EditHoliday):
+    try:
+        holiday = Holiday.objects.get(id=data.holiday_id)
+        holiday.name = data.name
+        holiday.date = data.date
+        holiday.save()
+        return 200, {"detail": "Holiday updated successfully."}
+    except Holiday.DoesNotExist:
+        return 404, {"detail": "Holiday not found."}
+
+
+@api.delete(
+    "/holidays/delete/",
+    auth=django_auth_superuser,
+    response={200: GenericDTO, 404: GenericDTO},
+)
+def delete_holiday(request: HttpRequest, data: DeleteHoliday):
+    try:
+        holiday = Holiday.objects.get(id=data.holiday_id)
+        holiday.delete()
+        return 200, {"detail": "Holiday deleted successfully."}
+    except Holiday.DoesNotExist:
+        return 404, {"detail": "Holiday not found."}
 
 
 @api.get(
