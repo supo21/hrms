@@ -52,6 +52,8 @@ function getCellContent(
     <TooltipCell trigger="Holiday" content={dayData.holiday} />
   ) : dayData.absence ? (
     <TooltipCell trigger="Time Off" content={dayData.absence} />
+  ) : dayData.expected_hours === 0 ? (
+    convertHoursToHHMM(dayData.hours_worked)
   ) : (
     "Absent"
   );
