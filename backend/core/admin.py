@@ -74,6 +74,7 @@ class TimeLogAdmin(admin.ModelAdmin[TimeLog]):
         "project",
         "activity",
     ]
+    list_filter = ["user", "date", "project", "activity"]
 
     def get_queryset(self, request: HttpRequest):
         queryset = super().get_queryset(request)
