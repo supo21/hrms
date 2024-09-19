@@ -38,7 +38,8 @@ function getCellContentDifference(
   const difference =
     (dayData.hours_worked || 0) - (dayData.expected_hours || 0);
   const sign = difference >= 0 ? "+" : "-";
-  return sign + convertHoursToHHMM(Math.abs(difference));
+  const color = sign === "+" ? "text-green-600" : "text-red-600";
+  return [sign + convertHoursToHHMM(Math.abs(difference)), color];
 }
 
 // This function returns the contents of cell in time summary
@@ -46,17 +47,21 @@ function getCellContentDifference(
 function getCellContent(
   dayData: components["schemas"]["TimeLogSummaryPerDay"]
 ) {
-  return dayData.hours_worked ? (
-    convertHoursToHHMM(dayData.hours_worked)
-  ) : dayData.holiday ? (
-    <TooltipCell trigger="Holiday" content={dayData.holiday} />
-  ) : dayData.absence ? (
-    <TooltipCell trigger="Time Off" content={dayData.absence} />
-  ) : dayData.expected_hours === 0 ? (
-    convertHoursToHHMM(dayData.hours_worked)
-  ) : (
-    "Absent"
-  );
+  return dayData.hours_worked
+    ? [convertHoursToHHMM(dayData.hours_worked), "text-green-600"]
+    : dayData.holiday
+    ? [
+        <TooltipCell trigger="Holiday" content={dayData.holiday} />,
+        "text-green-600",
+      ]
+    : dayData.absence
+    ? [
+        <TooltipCell trigger="Time Off" content={dayData.absence} />,
+        "text-blue-600",
+      ]
+    : dayData.expected_hours === 0
+    ? [convertHoursToHHMM(dayData.hours_worked), "text-green-600"]
+    : ["Absent", "text-red-600"];
 }
 
 interface IWorkingHours {
@@ -218,20 +223,14 @@ export default async function TimeSummary({
                           (dayData.hours_worked || 0) -
                           (dayData.expected_hours || 0);
 
-                        const content = showDifference
+                        const [content, color] = showDifference
                           ? getCellContentDifference(dayData)
                           : getCellContent(dayData);
 
                         return (
                           <TableCell
                             key={date.toISOString()}
-                            className={cn(
-                              "whitespace-nowrap",
-                              content === "Absent" ||
-                                (showDifference && difference < 0)
-                                ? "text-red-600"
-                                : "text-green-600"
-                            )}
+                            className={cn("whitespace-nowrap", color)}
                           >
                             {content}
                           </TableCell>
