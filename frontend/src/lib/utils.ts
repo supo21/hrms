@@ -23,15 +23,11 @@ export function getCookie(name: string) {
 }
 
 export function getDuration(start: Date, end: Date) {
-  const duration = intervalToDuration({
-    start,
-    end,
-  });
-  let text = "";
-  text += (duration.hours || 0) + "h";
-  text += (duration.minutes || 0) + "m";
+  const minutes = (Number(end) - Number(start)) / 60000;
 
-  return text.trim();
+  return minutes > 60
+    ? Math.floor(minutes / 60) + "h" + Math.floor(minutes % 60) + "m"
+    : Math.floor(minutes % 60) + "m";
 }
 
 export function convertHoursToHHMM(hours: number): string {

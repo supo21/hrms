@@ -23,7 +23,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import ProfileDropdown from "./profile-dropdown";
-import TimeLogCard from "./time-log-card";
+import TimeLogButton from "./time-log-button";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { components } from "@/lib/schema";
 import CommandMenu from "./command";
@@ -155,7 +155,7 @@ export default function Header({
           </div>
         </form>
       </div>
-      <TimeLogCard
+      <TimeLogButton
         initial={currentTimeLog}
         projects={projects}
         activities={activities}

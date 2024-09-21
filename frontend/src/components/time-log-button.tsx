@@ -9,7 +9,7 @@ import CountUp from "./count-up";
 import { CircleStop } from "lucide-react";
 import { format } from "date-fns";
 
-export default function TimeLogCard({
+export default function TimeLogButton({
   initial,
   projects,
   activities,
