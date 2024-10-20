@@ -38,7 +38,7 @@ class User(AbstractUser):
     expected_hours_sat = models.IntegerField(
         default=0, null=False, blank=False
     )
-    max_time_log_length = models.DurationField(default=timedelta(hours=8))
+    max_time_log_length = models.DurationField(default=timedelta(hours=0))
 
     def __str__(self) -> str:
         return self.username
