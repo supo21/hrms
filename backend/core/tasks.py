@@ -1,6 +1,8 @@
+from datetime import timedelta
 import dramatiq
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
+from django.db.models import F
 from django.utils import timezone
 from dramatiq_crontab import cron  # type: ignore
 
@@ -39,16 +41,11 @@ def absence_balance_credit():
 
 
 def check_time_logs():
-    current_time = timezone.now()
-    active_time_logs = TimeLog.objects.filter(end__isnull=True)
-
-    for time_log in active_time_logs:
-        user = time_log.user
-        elapsed_time = current_time - time_log.start
-
-        if elapsed_time > user.max_time_log_length:
-            time_log.end = time_log.start + elapsed_time
-            time_log.save()
+    TimeLog.objects.filter(
+        user__max_time_log_length__gt=timedelta(seconds=0),
+        start__lt=timezone.now() - F("user__max_time_log_length"),
+        end__isnull=True,
+    ).update(end=timezone.now())
 
 
 @cron("0 0 1 * *")
