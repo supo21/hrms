@@ -254,7 +254,6 @@ def time_log_summary(
     logs = TimeLog.objects.filter(
         date__gte=start,
         date__lte=end,
-        end__isnull=False,
     )
     absences = AbsenceBalance.objects.filter(
         date__gte=start, date__lte=end, delta=-1
@@ -274,6 +273,8 @@ def time_log_summary(
         f"{a.date}_{a.user.username}": a.description for a in absences
     }
     output: list[TimeLogSummaryDTO] = []
+
+    current_time = timezone.now()
     for u in users:
         user_data = TimeLogSummaryDTO(user=u.username, summary=[])
         date = start
@@ -284,7 +285,11 @@ def time_log_summary(
             hours_worked = (
                 sum(
                     [
-                        (i["end"] - i["start"]).total_seconds()
+                        (
+                            (i["end"] - i["start"]).total_seconds()
+                            if i["end"] is not None
+                            else (current_time - i["start"]).total_seconds()
+                        )
                         for i in logs_per_day
                     ]
                 )
